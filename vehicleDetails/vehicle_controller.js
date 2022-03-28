@@ -22,6 +22,7 @@ exports.addVehicleDetails=((req,res)=>{
                     // console.log('line 21',result._id)
                     // console.log('line 23',result)
                     req.body.vehicleOwner=result
+                    req.body.vehicleDetails=JSON.parse(req.body.vehicleDetails)
                 vehicleDetails.create(req.body,(err,data)=>{
                     if(err){throw err}
                     else{
@@ -38,8 +39,8 @@ exports.addVehicleDetails=((req,res)=>{
 
 exports.vehicleDetailsImage=(req,res)=>{
     try{
-        req.body.rcCopy = `http://192.168.0.112:6600/uploads/${req.files.rcCopy.filename}`
-        req.body.insuranceCopy=`http://192.168.0.112:6600/uploads/${req.files.insuranceCopy.filename}`
+        req.body.rcCopy = `http://192.168.0.112:6600/uploads/${req.files.rcCopy[0].filename}`
+        req.body.insuranceCopy=`http://192.168.0.112:6600/uploads/${req.files.insuranceCopy[0].filename}`
         vehicleDetailsImage.create(req.body,(err,data)=>{
             if(err)throw err
             console.log('line 45',data)
