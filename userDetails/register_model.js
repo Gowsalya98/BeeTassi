@@ -33,6 +33,10 @@ const otpSchema=mongoose.Schema({
     otp:Number,
     userDetails:{
         type:Object
+    },
+    deleteFlag:{
+        type:String,
+        default:false
     }
 })
 

@@ -1,11 +1,13 @@
 const router=require('express').Router()
 
-const {registerForDeliveryCandidate,login,ownerGetOurOwnEmployeeList,getAllDriverList,getSingleDriverData,updateDriverProfile,deleteDriverProfile}=require('../driverDetails/driver_controller')
+const {registerForDeliveryCandidate,login,verifyUserOtp,ownerGetOurOwnEmployeeList,getAllDriverList,getSingleDriverData,updateDriverProfile,deleteDriverProfile}=require('../driverDetails/driver_controller')
 const multer=require('../middleware/multer')
 const valid=require('../superControll/superAdmin_model')
 
 router.post('/register',multer.upload.single('profileImage'),valid.validation,registerForDeliveryCandidate)
+
 router.post('/login',valid.validation,login)
+router.get('/verifyUserOtp/:otp',verifyUserOtp)
 
 router.get('/ownerGetOurOwnEmployeeList',ownerGetOurOwnEmployeeList)
 

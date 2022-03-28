@@ -69,7 +69,15 @@ exports.login=((req,res)=>{
 
 exports.verifyUserOtp=(req,res)=>{
     try{
-
+        console.log('line 72',req.params.otp)
+        sendOtp.findOne({otp:req.params.otp,deleteFlag:'false'},(err,data)=>{
+            if(data.otp==req.params.otp){
+                console.log('line 75',data)
+                res.status(200).send({message:'you are authorized person',data})
+            }else{
+                res.status(400).send({message:"Invalid Otp"})
+            }
+        })
     }catch(err){
         res.status(500).send({message:err.message})
     }
