@@ -18,6 +18,10 @@ const registerSchema=mongoose.Schema({
     location:String,
     selectVehicle:String,
     userId:String,
+    rideStatus:{
+        type:String,
+        default:"waiting"
+    },
     deleteFlag:{
         type:String,
         default:false
