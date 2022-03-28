@@ -38,8 +38,8 @@ exports.addVehicleDetails=((req,res)=>{
 
 exports.vehicleDetailsImage=(req,res)=>{
     try{
-        req.body.rcCopy = `http://192.168.0.112:6600/uploads/${req.file.filename}`
-        req.body.insuranceCopy=`http://192.168.0.112:6600/uploads/${req.file.filename}`
+        req.body.rcCopy = `http://192.168.0.112:6600/uploads/${req.files.rcCopy.filename}`
+        req.body.insuranceCopy=`http://192.168.0.112:6600/uploads/${req.files.insuranceCopy.filename}`
         vehicleDetailsImage.create(req.body,(err,data)=>{
             if(err)throw err
             console.log('line 45',data)
