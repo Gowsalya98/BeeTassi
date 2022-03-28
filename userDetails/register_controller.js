@@ -59,7 +59,7 @@ exports.login=((req,res)=>{
 exports.userBookingCab= ((req, res) => {
     try{
         const userToken = jwt.decode(req.headers.authorization)
-        const id = useeroken.userId
+        const id = userToken.userId
         register.findOne({_id:id,deleteFlag:"false"},(err,data)=>{
             console.log("line 65",data)
                 if(data.contact==req.body.contact){
