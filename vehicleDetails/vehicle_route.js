@@ -4,7 +4,7 @@ const {addVehicleDetails,vehicleDetailsImage,getAllVehicleList,getSingleVehicleD
 const multer=require('../middleware/multer')
 
 router.post('/addVehicleDetails',multer.upload.single('vehicleImage'),addVehicleDetails)
-router.post('/vehicleDetailsImage',multer.upload.fields([{name:'rcCopy',maxCount:1},{name:'insuranceCopy',maxCount:1}]),vehicleDetailsImage)
+router.post('/image',multer.upload.fields([{name:'rcCopy',maxCount:1},{name:'insuranceCopy',maxCount:1}]),vehicleDetailsImage)
 
 router.get('/ownerGetOurOwnVehicleList',ownerGetOurOwnVehicleList)
 
