@@ -21,6 +21,12 @@ const vehicleDetailsSchema=mongoose.Schema({
     }
 })
 
-const vehicleDetails=mongoose.model('vehicleDetails',vehicleDetailsSchema)
+const vehicleDetailsImageSchema=mongoose.Schema({
+    rcCopy:String,
+    insuranceCopy:String
+})
 
-module.exports={vehicleDetails}
+const vehicleDetails=mongoose.model('vehicleDetails',vehicleDetailsSchema)
+const vehicleDetailsImage=mongoose.model('vehicleDetailsImage',vehicleDetailsImageSchema)
+
+module.exports={vehicleDetails,vehicleDetailsImage}

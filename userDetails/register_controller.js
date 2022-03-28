@@ -71,18 +71,11 @@ exports.userBookingCab= ((req, res) => {
                                       console.log("line 91", datas)
                                       if (datas) {
                                           console.log('line 94',datas)
-                                        //   req.body.rideStatus='waiting'
                                           register.findOneAndUpdate({_id:id},req.body,{new:true},async(err,result)=>{
                                               if(err)throw err
                                               console.log('line 97',result)
                                             const response = await fast2sms.sendMessage({ authorization: process.env.OTPKEY,message:otp,numbers:[req.body.contact]})
                                           res.status(200).send({ message: "verification otp send your mobile number",otp,result})
-                                        //   setTimeout(() => {
-                                        //       sendOtp.findOneAndDelete({ otp: otp }, (err, resultss) => {
-                                        //           console.log("line 100", resultss)
-                                        //           if (err) { throw err }
-                                        //       })
-                                        //   }, 60000)
                                           })
                                           
                                       }else{

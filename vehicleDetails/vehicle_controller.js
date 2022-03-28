@@ -1,5 +1,5 @@
 
-const {vehicleDetails}=require('./vehicle_model')
+const {vehicleDetails,vehicleDetailsImage}=require('./vehicle_model')
 const {register}=require('../ownerDetails/owner_model')
 //const {register}=require('../superControll/superAdmin_model')
 const jwt=require('jsonwebtoken')
@@ -35,6 +35,20 @@ exports.addVehicleDetails=((req,res)=>{
         res.status(500).send({message:err.message})
     }
 })
+
+exports.vehicleDetailsImage=(req,res)=>{
+    try{
+        req.body.rcCopy = `http://192.168.0.112:6600/uploads/${req.file.filename}`
+        req.body.insuranceCopy=`http://192.168.0.112:6600/uploads/${req.file.filename}`
+        vehicleDetailsImage.create(req.body,(err,data)=>{
+            if(err)throw err
+            console.log('line 45',data)
+            res.status(200).send({message:'Upload Image Successfull',data})
+        })
+    }catch(err){
+        res.status(500).send({message:err.message})
+    }
+}
 
 exports.ownerGetOurOwnVehicleList=(req,res)=>{
     try{

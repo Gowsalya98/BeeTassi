@@ -16,6 +16,7 @@
     "express": "^4.17.3",
     "express-validator": "^6.14.0",
     "fast-two-sms": "^3.0.0",
+    "geolib": "^3.3.3",
     "jsonwebtoken": "^8.5.1",
     "modules": "^0.4.0",
     "mongoose": "^6.2.6",
