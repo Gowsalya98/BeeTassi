@@ -1,5 +1,5 @@
 const {driverDetails}=require('./driver_model')
-
+const {sendOtp}=require('../userDetails/register_model')
 const jwt=require('jsonwebtoken')
 const bcrypt=require('bcrypt')
 
@@ -66,6 +66,14 @@ exports.login=((req,res)=>{
         res.status(500).send({message:err.message})
     }
 })
+
+exports.verifyUserOtp=(req,res)=>{
+    try{
+
+    }catch(err){
+        res.status(500).send({message:err.message})
+    }
+}
 
 exports.ownerGetOurOwnEmployeeList=((req,res)=>{
     try{

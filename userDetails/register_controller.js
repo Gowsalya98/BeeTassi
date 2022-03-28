@@ -65,7 +65,8 @@ exports.userBookingCab= ((req, res) => {
                 if(data.contact==req.body.contact){
                      const otp = randomString(3)
                                   console.log("otp", otp)
-                                  sendOtp.create({otp: otp },async(err, datas) => {
+                                  const userDetails=data
+                                  sendOtp.create({otp: otp,userDetails:userDetails},async(err, datas) => {
                                       if(err){throw err}
                                       console.log("line 91", datas)
                                       if (datas) {

@@ -30,7 +30,10 @@ const registerSchema=mongoose.Schema({
 })
 
 const otpSchema=mongoose.Schema({
-    otp:Number
+    otp:Number,
+    userDetails:{
+        type:Object
+    }
 })
 
 const register=mongoose.model('userRegister',registerSchema)
