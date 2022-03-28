@@ -58,15 +58,17 @@ exports.login=((req,res)=>{
 
 exports.userBookingCab= ((req, res) => {
     try{
-        const token = jwt.decode(req.headers.authorization)
-        const id = token.userId
+        const userToken = jwt.decode(req.headers.authorization)
+        const id = userToken.userId
         register.findOne({_id:id,deleteFlag:"false"},(err,data)=>{
             console.log("line 65",data)
                 if(data.contact==req.body.contact){
                      const otp = randomString(3)
                                   console.log("otp", otp)
                                   const userDetails=data
-                                  sendOtp.create({otp: otp,userDetails:userDetails},async(err, datas) => {
+                                  const UserToken=jwt.decode(req.headers.authorization)
+                                  const id=userToken.userId
+                                  sendOtp.create({_id:id},req.body,async(err, datas) => {
                                       if(err){throw err}
                                       console.log("line 91", datas)
                                       if (datas) {
