@@ -11,6 +11,16 @@ const driverSchema=mongoose.Schema({
     licenseValidIn:String,
     typeOfVehicle:String,
     driverId:String,
+    driverLocation:{
+        driverLatitude:{
+            type:Number,
+            default:0
+        },
+        driverLongitude:{
+            type:Number,
+            default:0
+        }
+    },
     deleteFlag:{
         type:String,
         default:false

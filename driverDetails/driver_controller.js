@@ -1,4 +1,5 @@
 const {driverDetails}=require('./driver_model')
+
 const jwt=require('jsonwebtoken')
 const bcrypt=require('bcrypt')
 
@@ -48,9 +49,11 @@ exports.login=((req,res)=>{
                     const token = jwt.sign({ userid }, 'secretKey')
                 console.log('token:',token)
             req.body.password = await bcrypt.hash(req.body.password, 10)
-                console.log('line 48',data)
-                res.status(200).send({message:"login successfull",token,data})
-            
+            driverDetails.findOneAndUpdate({email:data.email},req.body,{new:true},(err,datas)=>{
+                if(err)throw err
+                console.log('line 54',datas)
+                res.status(200).send({message:"login successfull",token,datas})
+            })
                 }else{
                     res.status(400).send('invalid email')
                 }

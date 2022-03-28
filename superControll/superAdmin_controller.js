@@ -34,7 +34,7 @@ exports.superAdminLogin = ((req, res) => {
                 // console.log(password)
                 if (password === true) {
                     const token = jwt.sign({ _id: data._id }, 'secret')
-                    res.status(200).send({ message: "login successfully",data, token })
+                    res.status(200).send({ message: "login successfully",token,data })
                 }
                 else { res.status(400).send('invalid password') }
             }
