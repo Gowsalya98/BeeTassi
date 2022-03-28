@@ -41,7 +41,7 @@ exports.login=((req,res)=>{
                 console.log('token:',token)
             req.body.password = await bcrypt.hash(req.body.password, 10)
                 console.log('line 42',data)
-                res.status(200).send({message:"login successfull",data,token})
+                res.status(200).send({message:"login successfull",token,data})
             
             }else{
                 res.status(400).send('invalid email')
@@ -75,12 +75,12 @@ exports.userBookingCab= ((req, res) => {
                                               console.log('line 97',result)
                                             const response = await fast2sms.sendMessage({ authorization: process.env.OTPKEY,message:otp,numbers:[req.body.contact]})
                                           res.status(200).send({ message: "verification otp send your mobile number",otp,result})
-                                          setTimeout(() => {
-                                              sendOtp.findOneAndDelete({ otp: otp }, (err, resultss) => {
-                                                  console.log("line 100", resultss)
-                                                  if (err) { throw err }
-                                              })
-                                          }, 60000)
+                                        //   setTimeout(() => {
+                                        //       sendOtp.findOneAndDelete({ otp: otp }, (err, resultss) => {
+                                        //           console.log("line 100", resultss)
+                                        //           if (err) { throw err }
+                                        //       })
+                                        //   }, 60000)
                                           })
                                           
                                       }else{
