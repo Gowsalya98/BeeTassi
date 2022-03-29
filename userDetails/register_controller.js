@@ -7,7 +7,6 @@ const { randomString } = require('../userDetails/random_string')
 const { register,sendOtp} = require('../userDetails/register_model')
 
 
-
 exports.registerForUserAndOwner=((req,res)=>{
     try{
         console.log('line 11',req.body)
