@@ -8,12 +8,19 @@ const { register,sendOtp} = require('../userDetails/register_model')
 
 
 
-exports.registerForUser=((req,res)=>{
+exports.registerForUserAndOwner=((req,res)=>{
     try{
         console.log('line 11',req.body)
         register.countDocuments({email:req.body.email},async(err,num)=>{
             if(num==0){
-               req.body.password=await bcrypt.hash(req.body.password,10)
+                req.body.password = await bcrypt.hash(req.body.password, 10)
+                if(req.body.profileImage ==null||undefined){
+                    req.body.profileImage=""
+                }else{
+                    req.body.profileImage=`http://192.168.0.112:6600/uploads/${req.body.profileImage}`
+                }
+                console.log("line 20",req.body.profileImage)
+
                 register.create(req.body,(err,data)=>{
                     if(err){throw err}
                     console.log('line 17',data)
@@ -33,7 +40,7 @@ exports.login=((req,res)=>{
         console.log('line 33',req.body)
     register.findOne({email:req.body.email},async(err,data)=>{
         if(data){
-            if(data.role=='user'){ 
+            console.log('line 43',data)
                 const userId = data._id
                // req.body.userId=userId
                 //console.log("line 38",req.body.userId)
@@ -42,12 +49,8 @@ exports.login=((req,res)=>{
             req.body.password = await bcrypt.hash(req.body.password, 10)
                 console.log('line 42',data)
                 res.status(200).send({message:"login successfull",token,data})
-            
-            }else{
-                res.status(400).send('invalid email')
-            }
         }else{
-            res.status(400).send('please signup')
+            res.status(400).send('please signup/invalid email')
         }
        
     })
@@ -66,6 +69,7 @@ exports.userBookingCab= ((req, res) => {
                      const otp = randomString(3)
                                   console.log("otp", otp)
                                   const userDetails=data
+                                  console.log('line 72',userDetails)
                                   sendOtp.create({otp: otp,userDetails:userDetails},async(err, datas) => {
                                       if(err){throw err}
                                       console.log("line 91", datas)
@@ -94,10 +98,23 @@ exports.userBookingCab= ((req, res) => {
 }
 })
 
+exports.getAllUserBookingDetails=(req,res)=>{
+    try{
+        const ownerToken=jwt.decode(req.headers.authorization)
+        const id=ownerToken.userId
+        sendOtp.find({},{otp:0},(err,data)=>{
+            if(err)throw err
+            res.status(200).send({message:'user booking Details',data})
+        })
+    }catch(err){
+        res.status(500).send({message:err.message})
+    }
+}
+
 
 exports.getAllUserList=((req,res)=>{
     try{
-        register.find({deleteFlag:"false"}, (err, data) => {
+        register.find({typeOfRole:'user',deleteFlag:"false"}, (err, data) => {
             if(err)throw err
                 console.log("line 133",data)
                 res.status(200).send({ message: data })
@@ -106,7 +123,6 @@ exports.getAllUserList=((req,res)=>{
         res.status(500).send({message:err.message})
     }
 })
-
 
 exports.getSingleUserDetails=((req,res)=>{
     try{

@@ -2,7 +2,7 @@ const mongoose=require('mongoose')
 
 const registerSchema=mongoose.Schema({
 
-    userName:String,
+    name:String,
     email:String,
     password:String,
     contact:Number,
@@ -14,21 +14,17 @@ const registerSchema=mongoose.Schema({
         dropLatitude:Number,
         dropLongitude:Number
     },
+    profileImage:String,
+    typeOfVehicle:String,
+    typeOfRole:String,
     address:String,
     location:String,
     selectVehicle:String,
     userId:String,
-    rideStatus:{
-        type:String,
-        default:"waiting"
-    },
+    ownerId:String,
     deleteFlag:{
         type:String,
         default:false
-    },
-    role:{
-        type:String,
-        default:"user"
     }
     
 })
@@ -44,7 +40,8 @@ const otpSchema=mongoose.Schema({
     }
 })
 
-const register=mongoose.model('userRegister',registerSchema)
+const register=mongoose.model('userAndOwnerRegister',registerSchema)
+
 const sendOtp=mongoose.model('otpSchema',otpSchema)
 
 module.exports={register,sendOtp}

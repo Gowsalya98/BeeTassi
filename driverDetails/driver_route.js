@@ -9,7 +9,7 @@ const valid=require('../superControll/superAdmin_model')
 router.post('/register',multer.upload.single('profileImage'),valid.validation,registerForDeliveryCandidate)
 
 router.post('/login',valid.validation,login)
-router.get('/verifyUserOtp/:otp',verifyUserOtp)
+router.get('/verifyUserOtp/:otp/:id',verifyUserOtp)
 
 router.get('/filterLocation/:latitude/:longitude',location)
 

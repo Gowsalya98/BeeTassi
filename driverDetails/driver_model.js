@@ -24,12 +24,7 @@ const driverSchema=mongoose.Schema({
     deleteFlag:{
         type:String,
         default:false
-    },
-    role:{
-        type:String,
-        default:"driver"
     }
-
 })
 
 const driverDetails=mongoose.model('driverDetails',driverSchema)

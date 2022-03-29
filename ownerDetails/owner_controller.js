@@ -1,7 +1,6 @@
-const {register}=require('./owner_model')
+const {register}=require('../userDetails/register_model')
 const jwt=require('jsonwebtoken')
 const bcrypt=require('bcrypt')
-const { text } = require('stream/consumers')
 
 exports.registerForOwnerDetails=((req,res)=>{
     //console.log('hai')
@@ -67,12 +66,6 @@ exports.login=((req,res)=>{
 exports.search = (async (req, res) => {
     console.log(req.params.key)
     try {
-            // const data = await register.find({
-            //     "$or":
-            //         [{ "companyName": { $regex: req.params.key } }
-            //         // { "location": { $regex: req.params.key } }
-            //         ]
-            // })
             const data=await register.find(
                 {
                     $search: {

@@ -1,5 +1,5 @@
 const {driverDetails}=require('./driver_model')
-const {sendOtp}=require('../userDetails/register_model')
+const {sendOtp, register}=require('../userDetails/register_model')
 const jwt=require('jsonwebtoken')
 const bcrypt=require('bcrypt')
 
@@ -71,9 +71,16 @@ exports.verifyUserOtp=(req,res)=>{
     try{
         console.log('line 72',req.params.otp)
         sendOtp.findOne({otp:req.params.otp},(err,data)=>{
+            console.log('line 74',data)
             if(data){
-                console.log('line 79',data)
-                res.status(200).send({message:'authorized person ride started',data})
+                console.log('line 79',data.userDetails.rideStatus)
+                data.userDetails.rideStatus='rideStart'
+                console.log('line 78',data.userDetails.rideStatus)
+                sendOtp.findOneAndUpdate({otp:data.otp},{$set:data},{new:true},(err,datas)=>{
+                    if(err)throw err 
+                    console.log('line 80',datas)
+                    res.status(200).send({message:'authorized person ride started',datas})
+                })
             }else{
                 res.status(400).send({message:'unauthorized person otp invalid'})  
             }
