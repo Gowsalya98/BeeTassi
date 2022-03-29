@@ -11,7 +11,7 @@ router.post('/register',multer.upload.single('profileImage'),valid.validation,re
 router.post('/login',valid.validation,login)
 router.get('/verifyUserOtp/:otp',verifyUserOtp)
 
-router.get('/filterLocation',location)
+router.get('/filterLocation/:latitude/:longitude',location)
 
 router.get('/ownerGetOurOwnEmployeeList',ownerGetOurOwnEmployeeList)
 
