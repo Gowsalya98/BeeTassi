@@ -14,10 +14,10 @@ exports.registerForUserAndOwner=((req,res)=>{
         register.countDocuments({email:req.body.email},async(err,num)=>{
             if(num==0){
                 req.body.password = await bcrypt.hash(req.body.password, 10)
-                if(req.body.profileImage ==null||undefined){
+                if(req.file ==null||undefined){
                     req.body.profileImage=""
                 }else{
-                    req.body.profileImage=`http://192.168.0.112:6600/uploads/${req.body.profileImage}`
+                    req.body.profileImage=`http://192.168.0.112:6600/uploads/${req.file.filename}`
                 }
                 console.log("line 20",req.body.profileImage)
 
