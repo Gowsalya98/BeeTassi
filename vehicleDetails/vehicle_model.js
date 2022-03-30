@@ -22,8 +22,7 @@ const vehicleDetailsSchema=mongoose.Schema({
 })
 
 const vehicleDetailsImageSchema=mongoose.Schema({
-    rcCopy:String,
-    insuranceCopy:String
+    image:String
 })
 
 const vehicleDetails=mongoose.model('vehicleDetails',vehicleDetailsSchema)

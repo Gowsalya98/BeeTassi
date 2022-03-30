@@ -1,15 +1,15 @@
 const {driverDetails}=require('./driver_model')
-const {sendOtp, register}=require('../userDetails/register_model')
+const {sendOtp}=require('../register/register_model')
 const jwt=require('jsonwebtoken')
 const bcrypt=require('bcrypt')
 
-exports.registerForDeliveryCandidate=((req,res)=>{
+exports.addDriver=((req,res)=>{
     //console.log('hai')
     console.log('line 7',req.body)
     try{
         console.log('line 9',req.body)
         const ownerToken=jwt.decode(req.headers.authorization)
-        const id = ownerToken.userid
+        const id = ownerToken.userId
         req.body.driverId=id
         driverDetails.countDocuments({email:req.body.email }, async (err, num) => {
             console.log('line 14',num)
@@ -71,16 +71,15 @@ exports.verifyUserOtp=(req,res)=>{
     try{
         console.log('line 72',req.params.otp)
         sendOtp.findOne({otp:req.params.otp},(err,data)=>{
-            console.log('line 74',data)
-            if(data){
-                console.log('line 79',data.userDetails.rideStatus)
-                data.userDetails.rideStatus='rideStart'
-                console.log('line 78',data.userDetails.rideStatus)
-                sendOtp.findOneAndUpdate({otp:data.otp},{$set:data},{new:true},(err,datas)=>{
-                    if(err)throw err 
-                    console.log('line 80',datas)
-                    res.status(200).send({message:'authorized person ride started',datas})
-                })
+             if(data){
+                console.log('line 74',data)
+            //     console.log('line 79',data.userDetails.rideStatus)
+            //     data.userDetails.rideStatus='rideStart'
+            //     console.log('line 78',data.userDetails.rideStatus)
+            //     sendOtp.findOneAndUpdate({otp:data.otp},{$set:data},{new:true},(err,datas)=>{
+            //         if(err)throw err 
+            //         console.log('line 80',datas)
+                    res.status(200).send({message:'authorized person ride started',data})
             }else{
                 res.status(400).send({message:'unauthorized person otp invalid'})  
             }
@@ -90,26 +89,13 @@ exports.verifyUserOtp=(req,res)=>{
     }
 }
 
-exports.ownerGetOurOwnEmployeeList=((req,res)=>{
-    try{
-        const ownerToken=jwt.decode(req.headers.authorization)
-        const id=ownerToken.userid
-        driverDetails.find({driverId:id,deleteFlag:'false'},(err,data)=>{
-            if(err)throw err
-            console.log('line 73',data)
-            res.status(200).send(data)
-        })
-    }catch(err){
-        res.status(500).send({message:err.message})
-    }
-})
 
 exports.getAllDriverList=((req,res)=>{
     try{
         driverDetails.find({deleteFlag:"false"},(err,data)=>{
             if(err)throw err
             console.log('line 71',data)
-            res.status(200).send(data)
+            res.status(200).send({data:data})
         })
     }catch(err){
         res.status(500).send({message:err.message})
@@ -123,7 +109,7 @@ exports.getSingleDriverData=((req,res)=>{
         driverDetails.findOne({_id:id,deleteFlag:"false"},(err,data)=>{
             if(err)throw err
             console.log('line 99',data)
-            res.status(200).send(data)
+            res.status(200).send({data:data})
         })
     }catch(err){
         res.status(500).send({message:err.message})
@@ -149,11 +135,11 @@ exports.updateDriverProfile=((req,res)=>{
 
 exports.deleteDriverProfile=((req,res)=>{
     try{
-        const driverToken=jwt.decode(req.headers.authorization)
-        const id=driverToken.userid
-        driverDetails.findOne({_id:id,deleteFlag:"false"},(err,data)=>{
+        const ownerToken=jwt.decode(req.headers.authorization)
+        const id=ownerToken.userId
+        driverDetails.findOne({_id:req.params.id,deleteFlag:"false"},(err,data)=>{
             if(err)throw err
-            driverDetails.findOneAndUpdate({_id:id},{$set:{deleteFlag:'true'}},{returnOriginal:false},(err,datas)=>{
+            driverDetails.findOneAndUpdate({_id:req.params.id},{$set:{deleteFlag:'true'}},{returnOriginal:false},(err,datas)=>{
                 if(err)throw err
                 console.log('line 130',datas)
                 res.status(200).send({message:"sucessfully deleted your data",datas})

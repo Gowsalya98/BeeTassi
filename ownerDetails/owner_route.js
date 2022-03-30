@@ -1,13 +1,13 @@
 const router=require('express').Router()
 
-const {registerForOwnerDetails,login,search,getAllOwnerList,getSingleOwnerDetails,updateOwnerProfile,deleteOwnerProfile}=require('./owner_controller')
-const valid=require('../superControll/superAdmin_model')
-const multer=require('../middleware/multer')
+const {search,getAllOwnerList,ownerGetOurOwnEmployeeList,ownerGetOurOwnVehicleList,getSingleOwnerDetails,updateOwnerProfile,deleteOwnerProfile}=require('./owner_controller')
 
-router.post('/register',multer.upload.single('profileImage'),valid.validation,registerForOwnerDetails)
-router.post('/login',valid.validation,login)
+router.get('/ownerGetOurOwnEmployeeList',ownerGetOurOwnEmployeeList)
+router.get('/ownerGetOurOwnVehicleList',ownerGetOurOwnVehicleList)
+
 router.get('/getAllOwnerList',getAllOwnerList)
 router.get('/getSingleOwnerDetails',getSingleOwnerDetails)
+
 router.put('/updateOwnerProfile',updateOwnerProfile)
 router.delete('/deleteOwnerProfile',deleteOwnerProfile)
 

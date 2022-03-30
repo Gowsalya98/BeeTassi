@@ -1,15 +1,14 @@
 
 const {vehicleDetails,vehicleDetailsImage}=require('./vehicle_model')
-const {register}=require('../ownerDetails/owner_model')
-//const {register}=require('../superControll/superAdmin_model')
+const {register}=require('../register/register_model')
 const jwt=require('jsonwebtoken')
 
 exports.addVehicleDetails=((req,res)=>{
     try{
         console.log('line 8',req.body)
         const ownerToken=jwt.decode(req.headers.authorization)
-        const id=ownerToken.userid
-       // console.log('line 12',id)
+        const id=ownerToken.userId
+       console.log('line 12',id)
         req.body.vehicleId=id
                 if(req.file==null||undefined){
                     req.body.vehicleImage=""
@@ -19,8 +18,8 @@ exports.addVehicleDetails=((req,res)=>{
                 }
                 register.findOne({_id:id,deleteFlag:'false'},(err,result)=>{
                     if(err)throw err
-                    // console.log('line 21',result._id)
-                    // console.log('line 23',result)
+                    console.log('line 21',result._id)
+                    console.log('line 23',result)
                     req.body.vehicleOwner=result
                     req.body.vehicleDetails=JSON.parse(req.body.vehicleDetails)
                 vehicleDetails.create(req.body,(err,data)=>{
@@ -39,26 +38,12 @@ exports.addVehicleDetails=((req,res)=>{
 
 exports.vehicleDetailsImage=(req,res)=>{
     try{
-        req.body.rcCopy = `http://192.168.0.112:6600/uploads/${req.files.rcCopy[0].filename}`
-        req.body.insuranceCopy=`http://192.168.0.112:6600/uploads/${req.files.insuranceCopy[0].filename}`
+        req.body.image = `http://192.168.0.112:6600/uploads/${req.file.filename}`
+        //req.body.insuranceCopy=`http://192.168.0.112:6600/uploads/${req.files.insuranceCopy[0].filename}`
         vehicleDetailsImage.create(req.body,(err,data)=>{
             if(err)throw err
             console.log('line 45',data)
             res.status(200).send({message:'Upload Image Successfull',data})
-        })
-    }catch(err){
-        res.status(500).send({message:err.message})
-    }
-}
-
-exports.ownerGetOurOwnVehicleList=(req,res)=>{
-    try{
-        const ownerToken=jwt.decode(req.headers.authorization)
-        const id=ownerToken.userid
-        vehicleDetails.find({vehicleId:id,deleteFlag:"false"},(err,data)=>{
-            if(err)throw err
-            console.log('line 45',data)
-            res.status(200).send({message:'Your Vehicle List',data})
         })
     }catch(err){
         res.status(500).send({message:err.message})
@@ -93,7 +78,7 @@ exports.getSingleVehicleDetails=(req,res)=>{
 exports.updateVehicleDetails=(req,res)=>{
     try{
         const ownerToken=jwt.decode(req.headers.authorization)
-        const id=ownerToken.userid
+        const id=ownerToken.userId
         vehicleDetails.findOne({vehicleId:id,deleteFlag:'false'},(err,datas)=>{
             if(err)throw err
             vehicleDetails.findOneAndUpdate({vehicleId:id},req.body,{new:true},(err,data)=>{
@@ -110,10 +95,10 @@ exports.updateVehicleDetails=(req,res)=>{
 exports.deleteVehicleDetails=(req,res)=>{
     try{
         const ownerToken=jwt.decode(req.headers.authorization)
-        const id=ownerToken.userid
-        vehicleDetails.findOne({vehicleId:id,deleteFlag:'false'},(err,datas)=>{
+        const id=ownerToken.userId
+        vehicleDetails.findOne({_id:req.params.id,deleteFlag:'false'},(err,datas)=>{
             if(err)throw err
-            vehicleDetails.findOneAndUpdate({vehicleId:id},{deleteFlag:'true'},{returnOriginal:false},(err,data)=>{
+            vehicleDetails.findOneAndUpdate({_id:req.params.id},{deleteFlag:'true'},{returnOriginal:false},(err,data)=>{
                 if(err)throw err
                 console.log('line 92',data)
                 res.status(200).send({message:'sucessfully delete your data',data})

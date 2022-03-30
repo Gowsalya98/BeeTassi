@@ -1,8 +1,10 @@
 const mongoose=require('mongoose')
+const {check}=require('express-validator')
 
 const registerSchema=mongoose.Schema({
 
     name:String,
+    companyName:String,
     email:String,
     password:String,
     contact:Number,
@@ -40,8 +42,14 @@ const otpSchema=mongoose.Schema({
     }
 })
 
-const register=mongoose.model('userAndOwnerRegister',registerSchema)
+const validation = [
+    check('email').trim().isEmail().withMessage('email  must be valid'),
+    check('password').isLength({ min: 5}).withMessage('password must be minimum 5 character')
+    
+]
+
+const register=mongoose.model('register',registerSchema)
 
 const sendOtp=mongoose.model('otpSchema',otpSchema)
 
-module.exports={register,sendOtp}
+module.exports={register,sendOtp,validation}
