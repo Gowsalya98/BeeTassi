@@ -16,6 +16,8 @@ const registerSchema=mongoose.Schema({
         dropLatitude:Number,
         dropLongitude:Number
     },
+    travelDistance:String,
+    price:Number,
     profileImage:String,
     typeOfVehicle:String,
     typeOfRole:String,
