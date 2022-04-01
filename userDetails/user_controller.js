@@ -1,6 +1,7 @@
 
 const fast2sms=require('fast-two-sms')
 const jwt=require('jsonwebtoken')
+const nodeGeocoder = require('node-geocoder');
 const { randomString } = require('./random_string')
 const { register,sendOtp} = require('../register/register_model')
 
@@ -9,21 +10,36 @@ exports.userBookingCab= ((req, res) => {
         const userToken = jwt.decode(req.headers.authorization)
         const id = userToken.userId
         register.findOne({_id:id,deleteFlag:"false"},(err,data)=>{
-            console.log("line 65",data)
+            console.log("line 13",data)
                 if(data.contact==req.body.contact){
                      const otp = randomString(3)
                                   console.log("otp", otp)
                                   const userDetails=data
-                                  console.log('line 72',userDetails)
+                                  console.log('line 18',userDetails)
                                   sendOtp.create({otp: otp,userDetails:userDetails},async(err, datas) => {
                                       if(err){throw err}
-                                      console.log("line 91", datas)
+                                      console.log("line 21", datas)
                                       if (datas) {
-                                          console.log('line 94',datas)
+                                          console.log('line 24',datas)
+                                       let options = { provider: 'openstreetmap' }
+                                    let geoCoder = nodeGeocoder(options);
+                                    const convertAddressToLatLon=(geoCoder.geocode('Srinivasa Hospital,kalavasal,madurai'))
+                                    req.body.dropLocation=convertAddressToLatLon
+                                       console.log('line 28',convertAddressToLatLon)             
+                                          const lat1=req.body.pickUpLocation.pickUpLatitude
+                                          console.log('line 30',lat1);
+                                          const lon1 =req.body.pickUpLocation.pickUpLongitude
+                                          console.log('line 32',lon1);
+                                          const lat2 =convertAddressToLatLon.Latitude
+                                          console.log('line 34',lat2);
+                                          const lon2=convertAddressToLatLon.dropLongitude
+                                          console.log('line 36',lon2);
+                                       const locationOfUser=(locationCalc(lat1,lon1,lat2,lon2).toFixed(1));
+                                          req.body.travelDistance=locationOfUser;
                                           register.findOneAndUpdate({_id:id},req.body,{new:true},async(err,result)=>{
                                               if(err)throw err
-                                              console.log('line 97',result)
-                                            const response = await fast2sms.sendMessage({ authorization: process.env.OTPKEY,message:otp,numbers:[req.body.contact]})
+                                              console.log('line 41',result)
+                                            //const response = await fast2sms.sendMessage({ authorization: process.env.OTPKEY,message:otp,numbers:[req.body.contact]})
                                           res.status(200).send({ message: "verification otp send your mobile number",otp,result})
                                           })
                                           
@@ -42,6 +58,34 @@ exports.userBookingCab= ((req, res) => {
     res.status(500).send({message:err.message})
 }
 })
+   
+    function locationCalc(lat1, lon1, lat2, lon2) 
+    {
+      var R =  6371;
+      var lat1 = toRad(lat1);
+      console.log('line 57',lat1) 
+      var lat2 = toRad(lat2);
+      console.log('line 59',lat2) 
+      var dLat = toRad(lat2-lat1);
+      console.log('line 61',dLat) 
+      var dLon = toRad(lon2-lon1);
+      console.log('line 63',dLon) 
+    
+      var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2);
+        console.log('line 67',a) 
+      var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+      console.log('line 69',c)
+      var resultOfKM= R * c;
+      console.log('resultOfKM',Math.floor(resultOfKM))
+      return Math.floor(resultOfKM);
+    }
+
+    // Converts numeric degrees to radians
+    function toRad(Value) 
+    {
+        return Value * Math.PI / 180;
+    }
 
 exports.getAllUserBookingDetails=(req,res)=>{
     try{
