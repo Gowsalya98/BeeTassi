@@ -33,20 +33,6 @@ app.get('/',(req,res)=>{
     res.send('welcome BeeTassi')
 })
 
-// let nodeGeocoder = require('node-geocoder');
- 
-// let options = {
-//   provider: 'openstreetmap'
-// };
- 
-// let geoCoder = nodeGeocoder(options);
-// geoCoder.geocode('Srinivasa Hospital,kalavasal,madurai')
-//   .then((res)=> {
-//     console.log(res);
-//   })
-//   .catch((err)=> {
-//     console.log(err);
-//   });
 app.listen(process.env.PORT, () => {
     console.log("port running on ", process.env.PORT)
 })

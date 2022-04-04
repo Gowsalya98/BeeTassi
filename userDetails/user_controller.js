@@ -59,7 +59,7 @@ exports.userBookingCab= (async(req, res) => {
                                           register.findOneAndUpdate({_id:id},req.body,{new:true},async(err,result)=>{
                                               if(err)throw err
                                               console.log('line 61',result)
-                                            //const response = await fast2sms.sendMessage({ authorization: process.env.OTPKEY,message:otp,numbers:[req.body.contact]})
+                                            const response = await fast2sms.sendMessage({ authorization: process.env.OTPKEY,message:otp,numbers:[req.body.contact]})
                                           res.status(200).send({ message: "verification otp send your mobile number",otp,result})
                                           })
                                           
