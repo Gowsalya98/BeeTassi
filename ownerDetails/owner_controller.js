@@ -6,25 +6,29 @@ const{vehicleDetails}=require('../vehicleDetails/vehicle_model')
 const jwt=require('jsonwebtoken')
 
 
-exports.search = (async (req, res) => {
+exports.search = async(req, res) => {
     console.log(req.params.key)
     try {
-            const data=await register.find(
-                {
-                    $search: {
-                      text: {
-                        query: 'search text',
-                        path: ['companyName','location']
-                      }
-                    }
-                  }
-             )
+            const data=await register.find({
+                "$or":
+                    [{ "companyName": { $regex: req.params.key } },
+                    { "location": { $regex: req.params.key } }
+                    ]
+            })
+            console.log('line 18',data);
             res.status(200).send({ message: "search done", data })
-        
+                 // {
+                //     $search: {
+                //       text: {
+                //         query: 'search text',
+                //         path: ['companyName','location']
+                //       }
+                //     }
+                //   }
     } catch (err) {
         res.status(400).send({ message: err.message })
     }
-})
+}
 exports.ownerGetOurOwnEmployeeList=((req,res)=>{
     try{
         const ownerToken=jwt.decode(req.headers.authorization)
