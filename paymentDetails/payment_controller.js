@@ -1,6 +1,7 @@
 const {payment}=require('./payment_model')
 const {register}=require('../register/register_model')
 const {makeId}=require('../userDetails/random_string')
+const res = require('express/lib/response')
 
 exports.createPayment=(req,res)=>{
     console.log('line 5',req.body)
@@ -49,4 +50,42 @@ exports.getSinglePaymentDetails=(req,res)=>{
     }catch(err){
         res.status(500).send({message:err.message})
     }
+}
+
+exports.superAdminPackageDetails=(req,res)=>{
+    try{
+        register.find({deleteFlag:'false'},(err,data)=>{
+            if(err)throw err
+            console.log('line 59',data)
+            var datas=data.filter((result)=>
+            {
+            if(data.price==70){
+                console.log('line 63',data.price)
+                var k=calculateCommission(5)
+                console.log('line 62',k)
+                return result
+            }
+            if(data.price>=70&&data.price<=200){
+                var k= calculateCommission(7)
+                console.log('line 65',k)
+            }
+            if(data.price<=200&&data.price>=1500){
+                var k=calculateCommission(10)
+                console.log('line 70',k)
+            }
+            if(data.price>=2000){
+                var k=calculateCommission(20)
+                console.log('line 74',k)
+            }
+                })
+                res.status(200).send(datas)
+        })
+    }catch(err){
+         res.status(200).send({message:err.message})
+    }
+}
+
+function calculateCommission(commissionPercentage){
+     var calculate=price/100*commissionPercentage
+     console.log('line 76',calculate)
 }

@@ -1,11 +1,12 @@
 
 const fast2sms=require('fast-two-sms')
 const jwt=require('jsonwebtoken')
-const nodeGeocoder = require('node-geocoder');
+//const nodeGeocoder = require('node-geocoder');
 const { randomString } = require('./random_string')
 const { register,sendOtp} = require('../register/register_model')
+const {vehicleDetails}=require('../vehicleDetails/vehicle_model')
 
-exports.userBookingCab= (async(req, res) => {
+exports.userBookingCab= async(req, res) => {
     try{
         const userToken = jwt.decode(req.headers.authorization)
         const id = userToken.userId
@@ -15,54 +16,30 @@ exports.userBookingCab= (async(req, res) => {
                      const otp = randomString(3)
                                   console.log("otp", otp)
                                   const userDetails=data
-                                  console.log('line 18',userDetails)
                                   sendOtp.create({otp: otp,userDetails:userDetails},async(err, datas) => {
                                       if(err){throw err}
-                                      console.log("line 21", datas)
                                       if (datas) {
-                                           console.log('line 24',datas)
-                                    //    let options = { provider: 'openstreetmap' }
-                                    // let geoCoder = nodeGeocoder(options);
-
-                                    // const convertAddressToLatLon=await(geoCoder.geocode(req.body.dropLocation))
-                                    // console.log('line 28',convertAddressToLatLon)
-                                    //     register.findOne({_id:id,deleteFlag:"false"},(err,resultData)=>{
-                                    //         if(err)throw err
-                                    //         console.log('line 31',resultData)
-
-                                    //         resultData.dropLocation.dropLatitude=convertAddressToLatLon[0].latitude
-                                    //         console.log('line 34',resultData.dropLocation.dropLatitude)
-
-                                    //         resultData.dropLocation.dropLongitude=convertAddressToLatLon[0].longitude  
-                                    //         console.log('line 37',resultData.dropLocation.dropLongitude)
-
                                           const lat1=req.body.pickUpLocation.pickUpLatitude
-                                          console.log('line 40',lat1);
-
                                           const lon1 =req.body.pickUpLocation.pickUpLongitude
-                                          console.log('line 43',lon1);
-
-                                          const lat2 = resultData.dropLocation.dropLatitude
-                                          console.log('line 46',lat2);
-
-                                          const lon2= resultData.dropLocation.dropLongitude
-                                          console.log('line 49',lon2);
-
+                                          const lat2 = req.body.dropLocation.dropLatitude    //resultData.ropLocation.dropLatitude 
+                                          const lon2= req.body.dropLocation.dropLongitude     //resultData.dropLocation.dropLongitude
+                                          
                                        const locationOfUser=(locationCalc(lat1,lon1,lat2,lon2).toFixed(1));
                                           req.body.travelDistance=locationOfUser;
-                                          console.log('line 53',req.body.travelDistance)
-                                          var rate=10;
+                                          console.log('line 30',req.body.travelDistance)
+                                          var rate=35;
                                           const count=rate*req.body.travelDistance
                                           req.body.price=count
-                                          console.log('line 57',req.body.price)
-
-                                          register.findOneAndUpdate({_id:id},req.body,{new:true},async(err,result)=>{
-                                              if(err)throw err
-                                              console.log('line 61',result)
-                                            const response = await fast2sms.sendMessage({ authorization: process.env.OTPKEY,message:otp,numbers:[req.body.contact]})
-                                          res.status(200).send({ message: "verification otp send your mobile number",otp,result})
-                                          })
-                                    
+                                          console.log('line 34',req.body.price)
+                                        register.findOne({_id:id},{deleteFlag:"false"},(err,regData)=>{
+                                            if(err){throw err}
+                                            register.findOneAndUpdate({_id:id},req.body,{new:true},async(err,result)=>{
+                                                if(err)throw err
+                                                console.log('line 61',result)
+                                              const response = await fast2sms.sendMessage({ authorization: process.env.OTPKEY,message:otp,numbers:[req.body.contact]})
+                                            res.status(200).send({ message: "verification otp send your mobile number",otp,result})
+                                            })
+                                        })
                                       }else{
                                           res.status(400).send('something wrong')
                                       }
@@ -77,7 +54,7 @@ exports.userBookingCab= (async(req, res) => {
 }catch(err){
     res.status(500).send({message:err.message})
 }
-})
+}
    
     function locationCalc(lat1, lon1, lat2, lon2) 
     {
@@ -123,8 +100,21 @@ exports.getAllUserBookingDetails=(req,res)=>{
     }
 }
 
-
-exports.getAllUserList=((req,res)=>{
+exports.userSearch=async(req,res)=>{
+    try{
+        const data=await vehicleDetails.find({
+            "$or":
+                [{ "vehicleDetails.vehicleType": { $regex: req.params.key } },
+                { "vehicleDetails.vehicleNumber": { $regex: req.params.key } }
+                ]
+        })
+        console.log('line 134',data);
+        res.status(200).send({ message: "search done", data })
+    }catch(err){
+        res.status(500).send({message:err.message})
+    }
+}
+exports.getAllUserList=(req,res)=>{
     try{
         register.find({typeOfRole:'user',deleteFlag:"false"}, (err, data) => {
             if(err)throw err
@@ -134,9 +124,9 @@ exports.getAllUserList=((req,res)=>{
     }catch(err){
         res.status(500).send({message:err.message})
     }
-})
+}
 
-exports.getSingleUserDetails=((req,res)=>{
+exports.getSingleUserDetails=(req,res)=>{
     try{
         const token = jwt.decode(req.headers.authorization)
         console.log(token)
@@ -151,10 +141,10 @@ exports.getSingleUserDetails=((req,res)=>{
     }catch(err){
         res.status(500).send({message:err.message})
     }
-})
+}
 
     
-exports.updateUserProfile=((req,res)=>{
+exports.updateUserProfile=(req,res)=>{
     try{
         const token = jwt.decode(req.headers.authorization)
     const id = token.userId
@@ -174,10 +164,10 @@ exports.updateUserProfile=((req,res)=>{
     }catch(err){
         res.status(500).send({message:err.message})
     }
-})
+}
 
 
-exports.deleteUserProfile=((req,res)=>{
+exports.deleteUserProfile=(req,res)=>{
     try{
         const token = jwt.decode(req.headers.authorization)
     const id = token.userId
@@ -197,4 +187,4 @@ exports.deleteUserProfile=((req,res)=>{
     }catch(err){
         res.status(500).send({message:err.message})
     }
-})
+}

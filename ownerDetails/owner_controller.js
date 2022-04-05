@@ -29,7 +29,7 @@ exports.search = async(req, res) => {
         res.status(400).send({ message: err.message })
     }
 }
-exports.ownerGetOurOwnEmployeeList=((req,res)=>{
+exports.ownerGetOurOwnEmployeeList=(req,res)=>{
     try{
         const ownerToken=jwt.decode(req.headers.authorization)
         const id=ownerToken.userId
@@ -41,7 +41,7 @@ exports.ownerGetOurOwnEmployeeList=((req,res)=>{
     }catch(err){
         res.status(500).send({message:err.message})
     }
-})
+}
 
 exports.ownerGetOurOwnVehicleList=(req,res)=>{
     try{
@@ -57,7 +57,7 @@ exports.ownerGetOurOwnVehicleList=(req,res)=>{
     }
 }
 
-exports.getAllOwnerList=((req,res)=>{
+exports.getAllOwnerList=(req,res)=>{
     try{
         register.find({typeOfRole:'owner'}, (err, data) => {
             console.log("line 88",data)
@@ -73,9 +73,9 @@ exports.getAllOwnerList=((req,res)=>{
     }catch(err){
         res.status(500).send({message:err.message})
     }
-})
+}
 
-exports.getSingleOwnerDetails=((req,res)=>{
+exports.getSingleOwnerDetails=(req,res)=>{
     try{
     const ownerToken = jwt.decode(req.headers.authorization)
     const id = ownerToken.userId
@@ -95,9 +95,9 @@ exports.getSingleOwnerDetails=((req,res)=>{
     }catch(err){
         res.status(500).send({message:err.message})
     }
-})
+}
 
-exports.updateOwnerProfile=((req,res)=>{
+exports.updateOwnerProfile=(req,res)=>{
     try{
         const ownerToken = jwt.decode(req.headers.authorization)
     const id = ownerToken.userId
@@ -117,9 +117,9 @@ exports.updateOwnerProfile=((req,res)=>{
     }catch(err){
         res.status(500).send({message:err.message})
     }
-})
+}
 
-exports.deleteOwnerProfile=((req,res)=>{
+exports.deleteOwnerProfile=(req,res)=>{
     try{
         const ownerToken = jwt.decode(req.headers.authorization)
     const id = ownerToken.userId
@@ -139,4 +139,4 @@ exports.deleteOwnerProfile=((req,res)=>{
     }catch(err){
         res.status(500).send({message:err.message})
     }
-})
+}
