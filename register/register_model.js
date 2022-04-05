@@ -9,12 +9,12 @@ const registerSchema=mongoose.Schema({
     password:String,
     contact:Number,
     pickUpLocation:{
-        pickUpLatitude:String,
-        pickUpLongitude:String
+        pickUpLatitude:Number,
+        pickUpLongitude:Number
     },
     dropLocation:{
-        dropLatitude:String,
-        dropLongitude:String
+        dropLatitude:Number,
+        dropLongitude:Number
     },
     travelDistance:String,
     price:Number,

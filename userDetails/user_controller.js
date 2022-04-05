@@ -20,21 +20,21 @@ exports.userBookingCab= (async(req, res) => {
                                       if(err){throw err}
                                       console.log("line 21", datas)
                                       if (datas) {
-                                          console.log('line 24',datas)
-                                       let options = { provider: 'openstreetmap' }
-                                    let geoCoder = nodeGeocoder(options);
+                                           console.log('line 24',datas)
+                                    //    let options = { provider: 'openstreetmap' }
+                                    // let geoCoder = nodeGeocoder(options);
 
-                                    const convertAddressToLatLon=await(geoCoder.geocode(req.body.dropLocation))
-                                    console.log('line 28',convertAddressToLatLon)
-                                        register.findOne({_id:id,deleteFlag:"false"},(err,resultData)=>{
-                                            if(err)throw err
-                                            console.log('line 31',resultData)
+                                    // const convertAddressToLatLon=await(geoCoder.geocode(req.body.dropLocation))
+                                    // console.log('line 28',convertAddressToLatLon)
+                                    //     register.findOne({_id:id,deleteFlag:"false"},(err,resultData)=>{
+                                    //         if(err)throw err
+                                    //         console.log('line 31',resultData)
 
-                                            resultData.dropLocation.dropLatitude=convertAddressToLatLon[0].latitude
-                                            console.log('line 34',resultData.dropLocation.dropLatitude)
+                                    //         resultData.dropLocation.dropLatitude=convertAddressToLatLon[0].latitude
+                                    //         console.log('line 34',resultData.dropLocation.dropLatitude)
 
-                                            resultData.dropLocation.dropLongitude=convertAddressToLatLon[0].longitude  
-                                            console.log('line 37',resultData.dropLocation.dropLongitude)
+                                    //         resultData.dropLocation.dropLongitude=convertAddressToLatLon[0].longitude  
+                                    //         console.log('line 37',resultData.dropLocation.dropLongitude)
 
                                           const lat1=req.body.pickUpLocation.pickUpLatitude
                                           console.log('line 40',lat1);
@@ -62,9 +62,6 @@ exports.userBookingCab= (async(req, res) => {
                                             const response = await fast2sms.sendMessage({ authorization: process.env.OTPKEY,message:otp,numbers:[req.body.contact]})
                                           res.status(200).send({ message: "verification otp send your mobile number",otp,result})
                                           })
-                                          
-
-                                        })
                                     
                                       }else{
                                           res.status(400).send('something wrong')
