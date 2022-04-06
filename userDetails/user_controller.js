@@ -31,15 +31,12 @@ exports.userBookingCab= async(req, res) => {
                                           const count=rate*req.body.travelDistance
                                           req.body.price=count
                                           console.log('line 34',req.body.price)
-                                        register.findOne({_id:id},{deleteFlag:"false"},(err,regData)=>{
-                                            if(err){throw err}
-                                            register.findOneAndUpdate({_id:id},req.body,{new:true},async(err,result)=>{
+                                            register.findOneAndUpdate({_id:id},{$set:{travelDistance:req.body.travelDistance,price:req.body.price,selectVehicle:req.body.selectVehicle,pickUpLocation:req.body.pickUpLocation,dropLocation:req.body.dropLocation }},{new:true},async(err,result)=>{
                                                 if(err)throw err
                                                 console.log('line 61',result)
-                                              const response = await fast2sms.sendMessage({ authorization: process.env.OTPKEY,message:otp,numbers:[req.body.contact]})
+                                            //   const response = await fast2sms.sendMessage({ authorization: process.env.OTPKEY,message:otp,numbers:[req.body.contact]})
                                             res.status(200).send({ message: "verification otp send your mobile number",otp,result})
                                             })
-                                        })
                                       }else{
                                           res.status(400).send('something wrong')
                                       }
@@ -60,19 +57,12 @@ exports.userBookingCab= async(req, res) => {
     {
       var R =  6371;
       var lat1 = toRad(lat1);
-      console.log('line 82',lat1) 
       var lat2 = toRad(lat2);
-      console.log('line 84',lat2) 
       var dLat = toRad(lat2-lat1);
-      console.log('line 86',dLat) 
-      var dLon = toRad(lon2-lon1);
-      console.log('line 88',dLon) 
-    
+      var dLon = toRad(lon2-lon1); 
       var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
         Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2);
-        console.log('line 92',a) 
       var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-      console.log('line 94',c)
       var resultOfKM= R * c;
       console.log('resultOfKM',Math.floor(resultOfKM))
       return Math.floor(resultOfKM);
