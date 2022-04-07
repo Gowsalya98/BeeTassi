@@ -54,38 +54,40 @@ exports.getSinglePaymentDetails=(req,res)=>{
 
 exports.superAdminPackageDetails=(req,res)=>{
     try{
-        register.find({deleteFlag:'false'},(err,data)=>{
+        payment.find({rideStatus:"finish",deleteFlag:'false'},(err,data)=>{
             if(err)throw err
             console.log('line 59',data)
-            var datas=data.filter((result)=>
-            {
-            if(data.price==70){
-                console.log('line 63',data.price)
-                var k=calculateCommission(5)
-                console.log('line 62',k)
-                return result
-            }
-            if(data.price>=70&&data.price<=200){
-                var k= calculateCommission(7)
-                console.log('line 65',k)
-            }
-            if(data.price<=200&&data.price>=1500){
-                var k=calculateCommission(10)
-                console.log('line 70',k)
-            }
-            if(data.price>=2000){
-                var k=calculateCommission(20)
-                console.log('line 74',k)
-            }
-                })
-                res.status(200).send(datas)
+            var datas=(data.price)*(10/100)
+            console.log('line 61',datas)
+            res.status(200).send(datas)
         })
+            // var datas=data.filter((result)=>
+            // {
+            // if(data.price==70){
+            //     console.log('line 63',data.price)
+            //     var k=calculateCommission(5)
+            //     console.log('line 62',k)
+            //     return result
+            // }
+            // if(data.price>=70&&data.price<=200){
+            //     var k= calculateCommission(7)
+            //     console.log('line 65',k)
+            // }
+            // if(data.price<=200&&data.price>=1500){
+            //     var k=calculateCommission(10)
+            //     console.log('line 70',k)
+            // }
+            // if(data.price>=2000){
+            //     var k=calculateCommission(20)
+            //     console.log('line 74',k)
+            // }
+            //     })
     }catch(err){
          res.status(200).send({message:err.message})
     }
 }
 
-function calculateCommission(commissionPercentage){
-     var calculate=price/100*commissionPercentage
-     console.log('line 76',calculate)
-}
+// function calculateCommission(commissionPercentage){
+//      var calculate=price/100*commissionPercentage
+//      console.log('line 76',calculate)
+// }

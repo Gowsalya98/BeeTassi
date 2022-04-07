@@ -1,6 +1,6 @@
 const bcrypt=require('bcrypt')
 const jwt=require('jsonwebtoken')
-const { register} = require('./register_model')
+const { register,image} = require('./register_model')
 
 exports.register=(req,res)=>{
     try{
@@ -9,16 +9,9 @@ exports.register=(req,res)=>{
             if(num==0){
                 console.log('line 10',num)
                 req.body.password = await bcrypt.hash(req.body.password, 10)
-                if(req.file ==null||undefined){
-                    req.body.profileImage=""
-                }else{
-                    req.body.profileImage=`http://192.168.0.112:6600/uploads/${req.file.filename}`
-                }
-                console.log("line 20",req.body.profileImage)
-
                 register.create(req.body,(err,data)=>{
                     if(err){throw err}
-                    console.log('line 17',data)
+                    console.log('line 21',data)
                     res.status(200).send({message:'Register successfully',data})
                 })
             }else{
@@ -29,7 +22,22 @@ exports.register=(req,res)=>{
         res.status(500).send({message:err.message})
     }
 }
-
+exports.registerImage=(req,res)=>{
+    try{
+        if(req.file ==null||undefined){
+            req.body.image=""
+        }else{
+            req.body.image=`http://192.168.0.112:6600/uploads/${req.file.filename}`
+        }
+        console.log("line 32",req.body.image)
+        image.create(req.body,(err,data)=>{
+            if(err)throw err
+            res.status(200).send({message:'image upload successfully',data})
+        })
+    }catch(err){
+        res.status(500).send({message:err.message})  
+    }
+}
 exports.login=(req,res)=>{
     try{
         console.log('line 33',req.body)

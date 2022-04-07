@@ -32,6 +32,9 @@ const registerSchema=mongoose.Schema({
     }
     
 })
+const imageSchema=mongoose.Schema({
+    image:String
+})
 
 const otpSchema=mongoose.Schema({
     otp:Number,
@@ -51,7 +54,7 @@ const validation = [
 ]
 
 const register=mongoose.model('register',registerSchema)
-
+const image=mongoose.model('imageSchema',imageSchema)
 const sendOtp=mongoose.model('otpSchema',otpSchema)
 
-module.exports={register,sendOtp,validation}
+module.exports={register,sendOtp,image,validation}
