@@ -3,7 +3,7 @@ const {register,login}=require('./register_controller')
 const valid=require('./register_model')
 const multer=require('../middleware/multer')
 
-router.post('/register',valid.validation,multer.upload.single('profileImage'),register)
+router.post('/register',multer.upload.single('profileImage'),valid.validation,register)
 router.post('/login',valid.validation,login)
 
 

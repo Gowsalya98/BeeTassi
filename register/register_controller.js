@@ -2,11 +2,12 @@ const bcrypt=require('bcrypt')
 const jwt=require('jsonwebtoken')
 const { register} = require('./register_model')
 
-exports.register=((req,res)=>{
+exports.register=(req,res)=>{
     try{
         console.log('line 11',req.body)
         register.countDocuments({email:req.body.email},async(err,num)=>{
             if(num==0){
+                console.log('line 10',num)
                 req.body.password = await bcrypt.hash(req.body.password, 10)
                 if(req.file ==null||undefined){
                     req.body.profileImage=""
@@ -27,9 +28,9 @@ exports.register=((req,res)=>{
     }catch(err){
         res.status(500).send({message:err.message})
     }
-})
+}
 
-exports.login=((req,res)=>{
+exports.login=(req,res)=>{
     try{
         console.log('line 33',req.body)
     register.findOne({email:req.body.email},async(err,data)=>{
@@ -51,4 +52,4 @@ exports.login=((req,res)=>{
     }catch(err){
         res.status(500).send({message:err.message})
     }
-})
+}
