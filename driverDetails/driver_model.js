@@ -25,7 +25,7 @@ const driverSchema=mongoose.Schema({
         type:String,
         default:false
     },
-    role:{
+    typeOfRole:{
         type:String,
         default:"driver"
     }

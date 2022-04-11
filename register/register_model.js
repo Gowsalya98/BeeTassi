@@ -7,6 +7,8 @@ const registerSchema=mongoose.Schema({
     companyName:String,
     email:String,
     password:String,
+    newPassword:String,
+    confirmPassword:String,
     contact:Number,
     pickUpLocation:{
         pickUpLatitude:Number,
@@ -54,7 +56,9 @@ const validation = [
 ]
 
 const register=mongoose.model('register',registerSchema)
+
 const image=mongoose.model('imageSchema',imageSchema)
+
 const sendOtp=mongoose.model('otpSchema',otpSchema)
 
 module.exports={register,sendOtp,image,validation}

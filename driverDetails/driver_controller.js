@@ -4,27 +4,25 @@ const jwt=require('jsonwebtoken')
 const bcrypt=require('bcrypt')
 
 exports.addDriver=((req,res)=>{
-    //console.log('hai')
-    console.log('line 7',req.body)
     try{
         console.log('line 9',req.body)
-        const ownerToken=jwt.decode(req.headers.authorization)
-        const id = ownerToken.userId
-        req.body.driverId=id
         driverDetails.countDocuments({email:req.body.email }, async (err, num) => {
             console.log('line 14',num)
             if (num == 0) {
+                const ownerToken=jwt.decode(req.headers.authorization)
+                const id = ownerToken.userId
+                req.body.driverId=id
                 req.body.password = await bcrypt.hash(req.body.password, 10)
                 if(req.file==null||undefined){
                     req.body.profileImage=""
                 }else{
-                console.log('line 20',req.file.filename)
+                console.log('line 19',req.file.filename)
                 req.body.profileImage = `http://192.168.0.112:6600/uploads/${req.file.filename}`
                 }
                 driverDetails.create(req.body,(err,data)=>{
                     if(err){throw err}
                     else{
-                        console.log('line 26',data)
+                        console.log('line 25',data)
                         res.status(200).send({message:"Register successfully",data})
                     }
                 })
@@ -37,35 +35,35 @@ exports.addDriver=((req,res)=>{
     }
 })
 
-exports.login=((req,res)=>{
-    try{
-        console.log("line 41",req.body)
-        driverDetails.findOne({email:req.body.email},async(err,data)=>{
-            console.log('line 43',data)
-            if(data){
-                if(data.role=="driver"){
-                    console.log("line 45",data.role)
-                    const userid=data._id
-                    const token = jwt.sign({ userid }, 'secretKey')
-                console.log('token:',token)
-            req.body.password = await bcrypt.hash(req.body.password, 10)
-            driverDetails.findOneAndUpdate({email:data.email},req.body,{new:true},(err,datas)=>{
-                if(err)throw err
-                console.log('line 54',datas)
-                res.status(200).send({message:"login successfull",token,datas})
-            })
-                }else{
-                    res.status(400).send('invalid email')
-                }
-            }else{
-                res.status(400).send('please signup')
-            }
-        })
+// exports.login=((req,res)=>{
+//     try{
+//         console.log("line 41",req.body)
+//         driverDetails.findOne({email:req.body.email},async(err,data)=>{
+//             console.log('line 43',data)
+//             if(data){
+//                 if(data.role=="driver"){
+//                     console.log("line 45",data.role)
+//                     const userid=data._id
+//                     const token = jwt.sign({ userid }, 'secretKey')
+//                 console.log('token:',token)
+//             req.body.password = await bcrypt.hash(req.body.password, 10)
+//             driverDetails.findOneAndUpdate({email:data.email},req.body,{new:true},(err,datas)=>{
+//                 if(err)throw err
+//                 console.log('line 54',datas)
+//                 res.status(200).send({message:"login successfull",token,datas})
+//             })
+//                 }else{
+//                     res.status(400).send('invalid email')
+//                 }
+//             }else{
+//                 res.status(400).send('please signup')
+//             }
+//         })
       
-    }catch(err){
-        res.status(500).send({message:err.message})
-    }
-})
+//     }catch(err){
+//         res.status(500).send({message:err.message})
+//     }
+// })
 
 exports.verifyUserOtp=(req,res)=>{
     try{
