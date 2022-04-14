@@ -9,7 +9,7 @@ router.post('/image',multer.upload.single('image'),registerImage)
 
 router.post('/login',valid.validation,login)
 
-router.post('/forgetPassword/:id',valid.validation,forgetPassword)
+router.post('/forgetPassword',valid.validation,forgetPassword)
 
 router.post('/aggregateLogin',valid.validation,aggregateLogin)
 

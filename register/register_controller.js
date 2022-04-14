@@ -51,7 +51,7 @@ exports.login=(req,res)=>{
                     if (data.typeOfRole==='user'||data.typeOfRole==='owner'||data.typeOfRole==='superAdmin') {
                         const verifyPassword = await bcrypt.compare(req.body.password,data.password)
                         if (verifyPassword === true) {
-                            const token = await jwt.sign({ userid: data._id }, process.env.SECRET_KEY)
+                            const token = await jwt.sign({ userId: data._id }, process.env.SECRET_KEY)
                             res.status(200).send({ message: 'login successfull',token,data })
                         } else {res.status(400).send({ message: 'password does not match' })}
                     }else{res.status(400).send({message:"something wrong"})}
@@ -61,7 +61,7 @@ exports.login=(req,res)=>{
                         if (data.typeOfRole==='driver'){
                             const verifyPassword = await bcrypt.compare(req.body.password,data.password)
                             if (verifyPassword === true) {
-                                const token = await jwt.sign({ userid: data._id }, process.env.SECRET_KEY)
+                                const token = await jwt.sign({ userId: data._id }, process.env.SECRET_KEY)
                                 var Location={}
                                 Location.driverLatitude=data.driverLocation.driverLatitude
                                 Location.driverLongitude=data.driverLocation.driverLongitude
@@ -87,9 +87,9 @@ exports.forgetPassword=(req,res)=>{
             sendOtp.findOne({ otp: req.body.otp }, async (err, result) => {
                 console.log("line 72", result)
                 if (result) {
-                    // const token = jwt.decode(req.headers.authorization)
-                    // const id = token.userid
-                    register.findOne({ _id:req.params.id }, async (err, data) => {
+                    const token = jwt.decode(req.headers.authorization)
+                    const id = token.userId
+                    register.findOne({ _id:id,deleteFlag:'false' }, async (err, data) => {
                         console.log("line 77", data)
                         if (data) {
                             if (req.body.email == data.email||req.body.contact==data.contact) {
@@ -101,7 +101,7 @@ exports.forgetPassword=(req,res)=>{
                                     console.log("line 82", req.body.confirmPassword)
 
                                     req.body.newPassword = await bcrypt.hash(req.body.newPassword, 10)
-                                    register.findOneAndUpdate({ _id:req.params.id }, { $set:{password: req.body.newPassword} },{new:true}, (err, datas) => {
+                                    register.findOneAndUpdate({ _id:id }, { $set:{password: req.body.newPassword} },{new:true}, (err, datas) => {
                                         if (err) { throw err }
                                         else {
                                             console.log('line 92',datas);
@@ -115,13 +115,15 @@ exports.forgetPassword=(req,res)=>{
                 } else { res.status(400).send({ message: 'invalid otp' }) }
             })
         } else {
-            // const token = jwt.decode(req.headers.authorization)
-            // const id = token.userid
-            register.findOne({ _id:req.params.id,deleteFlag:"false" },(err,data) => {
-                console.log("line103", data)
+            const token = jwt.decode(req.headers.authorization)
+            const id = token.userId
+            register.findOne({ _id:id,deleteFlag:'false'},(err,data) => {
+                console.log("line 103", data)
                 if (data) {
-                    console.log(req.body.email)
-                    if (req.body.email == data.email && req.body.contact==data.contact) {
+                    console.log('line 123',data.email);
+                    console.log('line 124',data.contact);
+                    if (req.body.email == data.email && req.body.contact == data.contact) {
+                        console.log('hai')
                         const otp = randomString(3)
                         console.log("otp", otp)
                         req.body.userDetails=data
@@ -145,7 +147,7 @@ exports.forgetPassword=(req,res)=>{
                             }
                         })
                     } else { res.status(400).send({ message: 'email and contact does not match' }) }
-                } else { res.status(400).send({ message: 'invalid id' }) }
+                } else { res.status(400).send({ message: 'invalid token' }) }
             })
         }
     }catch(err){

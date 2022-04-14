@@ -10,8 +10,9 @@ exports.userBookingCab= async(req, res) => {
     try{
         const userToken = jwt.decode(req.headers.authorization)
         const id = userToken.userId
+        console.log('line 13',req.body)
         register.findOne({_id:id,deleteFlag:"false"},(err,data)=>{
-            console.log("line 13",data)
+            console.log("line 15",data)
                 if(data.contact==req.body.contact){
                      const otp = randomString(3)
                                   console.log("otp", otp)
@@ -34,7 +35,7 @@ exports.userBookingCab= async(req, res) => {
                                             register.findOneAndUpdate({_id:id},{$set:{travelDistance:req.body.travelDistance,price:req.body.price,selectVehicle:req.body.selectVehicle,pickUpLocation:req.body.pickUpLocation,dropLocation:req.body.dropLocation }},{new:true},async(err,result)=>{
                                                 if(err)throw err
                                                 console.log('line 61',result)
-                                            //   const response = await fast2sms.sendMessage({ authorization: process.env.OTPKEY,message:otp,numbers:[req.body.contact]})
+                                        const response = await fast2sms.sendMessage({ authorization: process.env.OTPKEY,message:otp,numbers:[req.body.contact]})
                                             res.status(200).send({ message: "verification otp send your mobile number",otp,result})
                                             })
                                       }else{
@@ -137,9 +138,7 @@ exports.getSingleUserDetails=(req,res)=>{
 exports.updateUserProfile=(req,res)=>{
     try{
         const token = jwt.decode(req.headers.authorization)
-    const id = token.userId
-    console.log("line 162",token.userId)
-    console.log("line 163",id)
+        const id = token.userId
         register.findOne({_id:id,deleteFlag:"false"},(err,data)=>{
             if(err){throw err}
             else{
