@@ -3,7 +3,7 @@ const router=require('express').Router()
 const {addVehicleDetails,vehicleDetailsImage,getAllVehicleList,getSingleVehicleDetails,updateVehicleDetails,deleteVehicleDetails}=require('../vehicleDetails/vehicle_controller')
 const multer=require('../middleware/multer')
 
-router.post('/addVehicleDetails',multer.upload.single('vehicleImage'),addVehicleDetails)
+router.post('/addVehicleDetails',addVehicleDetails)
 router.post('/image',multer.upload.single('image'),vehicleDetailsImage)
 
 router.get('/getAllVehicleList',getAllVehicleList)

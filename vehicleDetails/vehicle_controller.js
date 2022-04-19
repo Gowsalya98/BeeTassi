@@ -10,18 +10,18 @@ exports.addVehicleDetails=((req,res)=>{
         const id=ownerToken.userId
        console.log('line 12',id)
         req.body.vehicleId=id
-                if(req.file==null||undefined){
-                    req.body.vehicleImage=""
-                }else{
-                console.log('line 14',req.file.filename)
-                req.body.vehicleImage = `http://192.168.0.112:6600/uploads/${req.file.filename}`
-                }
+                // if(req.file==null||undefined){
+                //     req.body.vehicleImage=""
+                // }else{
+                // console.log('line 14',req.file.filename)
+                // req.body.vehicleImage = `http://192.168.0.112:6600/uploads/${req.file.filename}`
+                // }
                 register.findOne({_id:id,deleteFlag:'false'},(err,result)=>{
                     if(err)throw err
                     console.log('line 21',result._id)
                     console.log('line 23',result)
                     req.body.vehicleOwner=result
-                    req.body.vehicleDetails=JSON.parse(req.body.vehicleDetails)
+                    //req.body.vehicleDetails=JSON.parse(req.body.vehicleDetails)
                 vehicleDetails.create(req.body,(err,data)=>{
                     if(err){throw err}
                     else{
@@ -39,7 +39,6 @@ exports.addVehicleDetails=((req,res)=>{
 exports.vehicleDetailsImage=(req,res)=>{
     try{
         req.body.image = `http://192.168.0.112:6600/uploads/${req.file.filename}`
-        //req.body.insuranceCopy=`http://192.168.0.112:6600/uploads/${req.files.insuranceCopy[0].filename}`
         vehicleDetailsImage.create(req.body,(err,data)=>{
             if(err)throw err
             console.log('line 45',data)

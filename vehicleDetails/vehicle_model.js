@@ -9,7 +9,7 @@ const vehicleDetailsSchema=mongoose.Schema({
         rcCopy:String,
         validIn:String,
         insuranceCopy:String,
-        validIn:String
+        insuranceValidIn:String
     }],
     vehicleId:String,
     vehicleOwner:{
