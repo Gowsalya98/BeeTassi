@@ -38,7 +38,11 @@ exports.addVehicleDetails=((req,res)=>{
 
 exports.vehicleDetailsImage=(req,res)=>{
     try{
+        if(req.file==undefined||null){
+            req.body.image=""
+        }else{
         req.body.image = `http://192.168.0.112:6600/uploads/${req.file.filename}`
+        }
         vehicleDetailsImage.create(req.body,(err,data)=>{
             if(err)throw err
             console.log('line 45',data)
@@ -80,9 +84,10 @@ exports.updateVehicleDetails=(req,res)=>{
         const id=ownerToken.userId
         vehicleDetails.findOne({vehicleId:id,deleteFlag:'false'},(err,datas)=>{
             if(err)throw err
+            console.log('line 87',datas)
             vehicleDetails.findOneAndUpdate({vehicleId:id},req.body,{new:true},(err,data)=>{
                 if(err)throw err
-                console.log('line 77',data)
+                console.log('line 90',data)
                 res.status(200).send({message:'sucessfully update vehicle details',data})
             })
         })

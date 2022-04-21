@@ -16,9 +16,9 @@ exports.addDriver=((req,res)=>{
                 if(req.file==null||undefined){
                     req.body.profileImage=""
                 }else{
-                console.log('line 19',req.file.filename)
-                req.body.profileImage = `http://192.168.0.112:6600/uploads/${req.file.filename}`
+                req.body.profileImage = `http://192.168.0.112:6600/uploads/${req.body.profileImage}`
                 }
+                console.log('line 21',req.body.profileImage)
                 driverDetails.create(req.body,(err,data)=>{
                     if(err){throw err}
                     else{
@@ -90,7 +90,7 @@ exports.verifyUserOtp=(req,res)=>{
 
 exports.getAllDriverList=((req,res)=>{
     try{
-        driverDetails.find({deleteFlag:"false"},(err,data)=>{
+        driverDetails.find({typeOfRole:"driver",deleteFlag:"false"},(err,data)=>{
             if(err)throw err
             console.log('line 71',data)
             res.status(200).send({data:data})
@@ -103,7 +103,7 @@ exports.getAllDriverList=((req,res)=>{
 exports.getSingleDriverData=((req,res)=>{
     try{
         const driverToken=jwt.decode(req.headers.authorization)
-        const id=driverToken.userid
+        const id=driverToken.userId
         driverDetails.findOne({_id:id,deleteFlag:"false"},(err,data)=>{
             if(err)throw err
             console.log('line 99',data)
@@ -117,12 +117,14 @@ exports.getSingleDriverData=((req,res)=>{
 exports.updateDriverProfile=((req,res)=>{
     try{
         const driverToken=jwt.decode(req.headers.authorization)
-        const id=driverToken.userid
+        const id=driverToken.userId
+        console.log('line 121',id)
         driverDetails.findOne({_id:id,deleteFlag:'false'},(err,data)=>{
             if(err)throw err
+            console.log('line 123',data)
             driverDetails.findOneAndUpdate({_id:id},req.body,{new:true},(err,datas)=>{
                 if(err)throw err
-                console.log('line 115',datas)
+                console.log('line 126',datas)
                 res.status(200).send({message:'update successfully',datas})
             })
         })

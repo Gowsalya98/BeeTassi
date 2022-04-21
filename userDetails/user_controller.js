@@ -32,7 +32,18 @@ exports.userBookingCab= async(req, res) => {
                                           const count=rate*req.body.travelDistance
                                           req.body.price=count
                                           console.log('line 34',req.body.price)
-                                            register.findOneAndUpdate({_id:id},{$set:{travelDistance:req.body.travelDistance,price:req.body.price,selectVehicle:req.body.selectVehicle,pickUpLocation:req.body.pickUpLocation,dropLocation:req.body.dropLocation }},{new:true},async(err,result)=>{
+                                            
+                                          var startLocation={}
+                                            startLocation.pickUpLatitude=req.body.pickUpLocation.pickUpLatitude
+                                            startLocation.pickUpLongitude=req.body.pickUpLocation.pickUpLongitude
+                                                req.body.pickUpLocation=startLocation
+
+                                            var endLocation={}
+                                            endLocation.dropLatitude=req.body.dropLocation.dropLatitude
+                                            endLocation.dropLongitude=req.body.dropLocation.dropLongitude 
+                                                req.body.dropLocation=endLocation
+                                               
+                                            register.findOneAndUpdate({_id:id},req.body,{new:true},async(err,result)=>{
                                                 if(err)throw err
                                                 console.log('line 61',result)
                                         const response = await fast2sms.sendMessage({ authorization: process.env.OTPKEY,message:otp,numbers:[req.body.contact]})

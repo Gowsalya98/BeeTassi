@@ -57,8 +57,8 @@ exports.login=(req,res)=>{
                     }else{res.status(400).send({message:"something wrong"})}
                 }else{
                     driverDetails.findOne({ email: req.body.email,deleteFlag:"false"},async (err, data) => {
-                        console.log("line 50",data)
-                        if (data.typeOfRole==='driver'){
+                        console.log("line 60",data)
+                        if (data.typeOfRole=='driver'){
                             const verifyPassword = await bcrypt.compare(req.body.password,data.password)
                             if (verifyPassword === true) {
                                 const token = await jwt.sign({ userId: data._id }, process.env.SECRET_KEY)
@@ -66,7 +66,7 @@ exports.login=(req,res)=>{
                                 Location.driverLatitude=data.driverLocation.driverLatitude
                                 Location.driverLongitude=data.driverLocation.driverLongitude
                                     req.body.driverLocation=Location
-                driverDetails.findOneAndUpdate({email:req.body.email,deleteFlag:"false"},req.body,{new:true},(err,datas)=>{
+                                    driverDetails.findOneAndUpdate({email:req.body.email,deleteFlag:"false"},req.body,{new:true},(err,datas)=>{
                                 res.status(200).send({ message: 'login successfull',token,datas })
                             
                         })
