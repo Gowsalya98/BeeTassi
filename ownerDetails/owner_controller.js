@@ -59,13 +59,11 @@ exports.ownerGetOurOwnVehicleList=(req,res)=>{
 
 exports.getAllOwnerList=(req,res)=>{
     try{
-        register.find({typeOfRole:'owner'}, (err, data) => {
+        register.find({typeOfRole:'owner',deleteFlag:'false'}, (err, data) => {
+            if(data){
             console.log("line 88",data)
-            if (data[0].deleteFlag == "false") {
-                console.log("line 90",data)
                 res.status(200).send({ data: data })
             } else {
-                console.log('your data is already deleted')
                 res.status(400).send({ message: 'your data is already deleted' })
             }
 
