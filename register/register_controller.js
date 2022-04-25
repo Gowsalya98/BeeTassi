@@ -45,7 +45,7 @@ exports.registerImage=(req,res)=>{
 exports.login=(req,res)=>{
     try {
         console.log('line 47',req.body)
-        register.findOne({ email: req.body.email,deleteFlag:"false"},async (err, data) => {
+        register.findOne({ email: req.body.email,deleteFlag:'false'},async (err, data) => {
                 console.log("line 50",data)
                 if(data!=null){
                     if (data.typeOfRole==='user'||data.typeOfRole==='owner'||data.typeOfRole==='superAdmin') {
