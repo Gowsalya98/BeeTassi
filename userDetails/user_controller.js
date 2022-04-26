@@ -8,10 +8,10 @@ const {vehicleDetails}=require('../vehicleDetails/vehicle_model')
 
 exports.userBookingCab= async(req, res) => {
     try{
-        const userToken = jwt.decode(req.headers.authorization)
-        const id = userToken.userId
-        console.log('line 13',req.body)
-        register.findOne({_id:id,deleteFlag:"false"},(err,data)=>{
+        // const userToken = jwt.decode(req.headers.authorization)
+        // const id = userToken.userId
+         console.log('line 13',req.body)
+        register.findOne({_id:req.params.id,deleteFlag:"false"},(err,data)=>{
             console.log("line 15",data)
                 if(data.contact==req.body.contact){
                      const otp = randomString(3)
@@ -21,9 +21,13 @@ exports.userBookingCab= async(req, res) => {
                                       if(err){throw err}
                                       if (datas) {
                                           const lat1=req.body.pickUpLocation.pickUpLatitude
+                                          console.log('line 24',lat1);
                                           const lon1 =req.body.pickUpLocation.pickUpLongitude
+                                          console.log('line 24',lon1);
                                           const lat2 = req.body.dropLocation.dropLatitude    //resultData.ropLocation.dropLatitude 
+                                          console.log('line 24',lat2);
                                           const lon2= req.body.dropLocation.dropLongitude     //resultData.dropLocation.dropLongitude
+                                          console.log('line 24',lon2);
                                           
                                        const locationOfUser=(locationCalc(lat1,lon1,lat2,lon2).toFixed(1));
                                           req.body.travelDistance=locationOfUser;
@@ -43,7 +47,7 @@ exports.userBookingCab= async(req, res) => {
                                             endLocation.dropLongitude=req.body.dropLocation.dropLongitude 
                                                 req.body.dropLocation=endLocation
                                                
-                                            register.findOneAndUpdate({_id:id},req.body,{new:true},async(err,result)=>{
+                                            register.findOneAndUpdate({_id:req.params.id},req.body,{new:true},async(err,result)=>{
                                                 if(err)throw err
                                                 console.log('line 61',result)
                                         const response = await fast2sms.sendMessage({ authorization: process.env.OTPKEY,message:otp,numbers:[req.body.contact]})

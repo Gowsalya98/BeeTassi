@@ -9,7 +9,7 @@ router.put('/updateUserProfile',updateUserProfile)
 router.delete('/deleteUserProfile',deleteUserProfile)
 
 
-router.post('/userBookToCab',validationResult.validation,userBookingCab)
+router.post('/userBookToCab/:id',validationResult.validation,userBookingCab)
 router.get('/getAllUserBookingDetails',getAllUserBookingDetails)
 
 router.get('/search/:key',userSearch)

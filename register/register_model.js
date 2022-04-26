@@ -18,14 +18,23 @@ const registerSchema=mongoose.Schema({
         dropLatitude:Number,
         dropLongitude:Number
     },
-    travelDistance:String,
-    price:Number,
+    travelDistance:{
+        type:String,
+        default:0
+    },
+    price:{
+    type:Number,
+    default:0
+    },
     profileImage:String,
     typeOfVehicle:String,
     typeOfRole:String,
     address:String,
     location:String,
-    selectVehicle:String,
+    selectVehicle:{
+    type:String,
+    default:''
+    },
     userId:String,
     ownerId:String,
     deleteFlag:{
