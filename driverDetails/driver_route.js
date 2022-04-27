@@ -9,7 +9,7 @@ const valid=require('../register/register_model')
 router.post('/addDriver',multer.upload.single('profileImage'),valid.validation,addDriver)
 
 //router.post('/login',valid.validation,login)
-router.get('/verifyUserOtp/:otp',verifyUserOtp)
+router.get('/verifyUserOtp/:otp/:userBookingId',verifyUserOtp)
 
 router.get('/filterLocation/:latitude/:longitude',location)
 

@@ -3,13 +3,12 @@ const fast2sms=require('fast-two-sms')
 const jwt=require('jsonwebtoken')
 //const nodeGeocoder = require('node-geocoder');
 const { randomString } = require('./random_string')
+const {userBooking}=require('./user_model')
 const { register,sendOtp} = require('../register/register_model')
 const {vehicleDetails}=require('../vehicleDetails/vehicle_model')
 
 exports.userBookingCab= async(req, res) => {
     try{
-        // const userToken = jwt.decode(req.headers.authorization)
-        // const id = userToken.userId
          console.log('line 13',req.body)
         register.findOne({_id:req.params.id,deleteFlag:"false"},(err,data)=>{
             console.log("line 15",data)
@@ -21,13 +20,13 @@ exports.userBookingCab= async(req, res) => {
                                       if(err){throw err}
                                       if (datas) {
                                           const lat1=req.body.pickUpLocation.pickUpLatitude
-                                          console.log('line 24',lat1);
+                                          console.log('line 22',lat1);
                                           const lon1 =req.body.pickUpLocation.pickUpLongitude
                                           console.log('line 24',lon1);
                                           const lat2 = req.body.dropLocation.dropLatitude    //resultData.ropLocation.dropLatitude 
-                                          console.log('line 24',lat2);
+                                          console.log('line 26',lat2);
                                           const lon2= req.body.dropLocation.dropLongitude     //resultData.dropLocation.dropLongitude
-                                          console.log('line 24',lon2);
+                                          console.log('line 28',lon2);
                                           
                                        const locationOfUser=(locationCalc(lat1,lon1,lat2,lon2).toFixed(1));
                                           req.body.travelDistance=locationOfUser;
@@ -46,8 +45,8 @@ exports.userBookingCab= async(req, res) => {
                                             endLocation.dropLatitude=req.body.dropLocation.dropLatitude
                                             endLocation.dropLongitude=req.body.dropLocation.dropLongitude 
                                                 req.body.dropLocation=endLocation
-                                               
-                                            register.findOneAndUpdate({_id:req.params.id},req.body,{new:true},async(err,result)=>{
+                                               req.body.userDetails=data
+                                            userBooking.create(req.body,async(err,result)=>{
                                                 if(err)throw err
                                                 console.log('line 61',result)
                                         const response = await fast2sms.sendMessage({ authorization: process.env.OTPKEY,message:otp,numbers:[req.body.contact]})
@@ -90,19 +89,22 @@ exports.userBookingCab= async(req, res) => {
         return Value * Math.PI / 180;
     }
 
-exports.getAllUserBookingDetails=(req,res)=>{
+exports.getAllUserBookingDetails=async(req,res)=>{
     try{
-        const ownerToken=jwt.decode(req.headers.authorization)
-        const id=ownerToken.userId
-        console.log('line 50',id)
-        console.log('line 51',ownerToken.userId)
-        sendOtp.find({deleteFlag:'false'},{otp:0},(err,data)=>{
-            if(err)throw err
-            console.log('line 54',data)
-            res.status(200).send({message:'user booking Details',data})
-        })
+       if(req.headers.authorization){
+        const data=await userBooking.find({})
+            if(data){
+                console.log('line 96',data)
+                res.status(200).send({message:'user booking Details',data})
+            }else{
+                res.status(302).send({success:'false',message:'data not exists',data:[]})
+            }
+       }else{
+           res.status(400).send({success:'false',message:'unauthorized'})
+       }
+       
     }catch(err){
-        res.status(500).send({message:err.message})
+        res.status(500).send({success:'false',message:'internal server error'})
     }
 }
 
@@ -117,56 +119,59 @@ exports.userSearch=async(req,res)=>{
         console.log('line 134',data);
         res.status(200).send({ message: "search done", data })
     }catch(err){
-        res.status(500).send({message:err.message})
+        res.status(500).send({success:'false',message:'internal server error'})
     }
 }
-exports.getAllUserList=(req,res)=>{
+exports.getAllUserList=async(req,res)=>{
     try{
-        register.find({typeOfRole:'user',deleteFlag:"false"}, (err, data) => {
-            if(err)throw err
-                console.log("line 133",data)
-                res.status(200).send({ message: data })
-        })
+       const data= await register.aggregate([{$match:{$and:[{typeOfRole:"user",deleteFlag:"false"}]}}])
+            if(data){
+                console.log("line 128",data)
+                res.status(200).send({ success:'true',message: 'successfull',data:data })
+            }else{ 
+                res.status(302).send({ success:'false',message: 'data not exists',data:[]})      
+                    }
     }catch(err){
-        res.status(500).send({message:err.message})
+        res.status(500).send({success:'false',message:'internal server error'})
     }
 }
 
 exports.getSingleUserDetails=(req,res)=>{
     try{
         const token = jwt.decode(req.headers.authorization)
-        console.log(token)
         const id = token.userId
-        console.log('line 144',token.userId)
-        console.log('line 145',id)
             register.findOne({_id:id,deleteFlag:"false"},(err,data)=>{
-                if(err)throw err
-                console.log('line 146',data)
-                res.status(200).send({message:data})
+                if(data){
+                console.log('line 144',data)
+                res.status(200).send({ success:'true',message: 'successfull',data:data })
+                }else{
+                    res.status(302).send({ success:'false',message: 'data not exists',data:[]})
+                }
             })
     }catch(err){
-        res.status(500).send({message:err.message})
+        res.status(500).send({success:'false',message:'internal server error'})
     }
 }
 
     
-exports.updateUserProfile=(req,res)=>{
+exports.updateUserProfile=async(req,res)=>{
     try{
-        const token = jwt.decode(req.headers.authorization)
-        const id = token.userId
-        register.findOne({_id:id,deleteFlag:"false"},(err,data)=>{
-            if(err){throw err}
-            else{
-                console.log('line 167',data)
-                register.findOneAndUpdate({_id:id},req.body,{new:true},(err,result)=>{
-                    if(err)throw err
-                    console.log('line 170',result)
-                    res.status(200).send({message:'profile update successfully',result})
-                })
+       if(req.headers.authorization){
+           if(req.params.userId.length==24){
+               let data=await register.findByIdAndUpdate({_id:req.params.userId},{$set:req.body},{new:true})
+               if (data) {
+                res.status(200).send({ success:'true',message:'update user profile successfully',data: data });
+              } else {
+                res.status(302).send({ success:'false',data: [] });
+              }
+            } else {
+              res.status(200).send({ message: "please provide a valid id" });
             }
-        })
+          }else{
+            res.status(400).send({ message: "unauthorized" });
+          }
     }catch(err){
-        res.status(500).send({message:err.message})
+        res.status(500).send({success:'false',message:'internal server error'})
     }
 }
 
@@ -174,21 +179,19 @@ exports.updateUserProfile=(req,res)=>{
 exports.deleteUserProfile=(req,res)=>{
     try{
         const token = jwt.decode(req.headers.authorization)
-    const id = token.userId
-    console.log("line 184",token.userId)
-    console.log("line 185",id)
+        const id = token.userId
         register.findOne({_id:id,deleteFlag:"false"},(err,data)=>{
-            if(err){throw err}
-            else{
-                console.log('line 189',data)
+            if(data){
                 register.findOneAndUpdate({_id:id},{$set:{deleteFlag:true}},{returnOriginal:false},(err,result)=>{
                     if(err)throw err
                     console.log('line 192',result)
                     res.status(200).send({message:'deleted successfully',result})
                 })
+            }else{
+                res.status(400).send({message:'invalid token'})   
             }
         })
     }catch(err){
-        res.status(500).send({message:err.message})
+        res.status(500).send({success:'false',message:'internal server error'})
     }
 }

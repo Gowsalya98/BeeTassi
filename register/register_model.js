@@ -10,31 +10,14 @@ const registerSchema=mongoose.Schema({
     newPassword:String,
     confirmPassword:String,
     contact:Number,
-    pickUpLocation:{
-        pickUpLatitude:Number,
-        pickUpLongitude:Number
-    },
-    dropLocation:{
-        dropLatitude:Number,
-        dropLongitude:Number
-    },
-    travelDistance:{
+    profileImage:{
         type:String,
-        default:0
+        default:""
     },
-    price:{
-    type:Number,
-    default:0
-    },
-    profileImage:String,
     typeOfVehicle:String,
     typeOfRole:String,
     address:String,
     location:String,
-    selectVehicle:{
-    type:String,
-    default:''
-    },
     userId:String,
     ownerId:String,
     deleteFlag:{

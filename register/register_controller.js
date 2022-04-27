@@ -23,7 +23,7 @@ exports.register=(req,res)=>{
             }
         })
     }catch(err){
-        res.status(500).send({message:err.message})
+        res.status(500).send({success:'false',message:'internal server error'})
     }
 }
 exports.registerImage=(req,res)=>{
@@ -39,7 +39,7 @@ exports.registerImage=(req,res)=>{
             res.status(200).send({message:'image upload successfully',data})
         })
     }catch(err){
-        res.status(500).send({message:err.message})  
+        res.status(500).send({success:'false',message:'internal server error'})  
     }
 }
 exports.login=(req,res)=>{
@@ -48,7 +48,7 @@ exports.login=(req,res)=>{
         register.findOne({ email: req.body.email,deleteFlag:'false'},async (err, data) => {
                 console.log("line 50",data)
                 if(data!=null){
-                    if (data.typeOfRole==='user'||data.typeOfRole==='owner'||data.typeOfRole==='superAdmin') {
+                    if (data.typeOfRole==='user'||data.typeOfRole==='owner') {
                         const verifyPassword = await bcrypt.compare(req.body.password,data.password)
                         if (verifyPassword === true) {
                             const token = await jwt.sign({ userId: data._id }, process.env.SECRET_KEY)
@@ -77,7 +77,7 @@ exports.login=(req,res)=>{
                 }
         })
     } catch (error) {
-        res.status(500).send(error)
+        res.status(500).send({success:'false',message:'internal server error'})
     }
 }
 
@@ -151,7 +151,7 @@ exports.forgetPassword=(req,res)=>{
             })
         }
     }catch(err){
-        res.status(500).send({message:err.message})
+        res.status(500).send({success:'false',message:'internal server error'})
     }
 }
 let transport = nodemailer.createTransport({

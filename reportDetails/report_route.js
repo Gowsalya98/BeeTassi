@@ -2,9 +2,9 @@ const router=require('express').Router()
 
 const {reportForTaxi,getAllReportList,getSingleReportDetails,userDeleteOurOwnReportDetails}=require('./report_controller')
 
-const multer=require('../middleware/multer')
+//const multer=require('../middleware/multer')
 
-router.post('/report/:id',multer.upload.single('taxiImage'),reportForTaxi)
+router.post('/report',reportForTaxi)
 
 router.get('/getAllReportList',getAllReportList)
 router.get('/getSingleReportDetails/:id',getSingleReportDetails)

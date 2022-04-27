@@ -2,7 +2,7 @@ const mongoose=require('mongoose')
 
 const reportSchema=mongoose.Schema({
 
-    taxiImage:String,
+    vehicleNumber:String,
     message:String,
     userDetails:{
         type:Object

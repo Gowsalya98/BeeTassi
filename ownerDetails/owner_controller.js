@@ -33,10 +33,13 @@ exports.ownerGetOurOwnEmployeeList=(req,res)=>{
     try{
         const ownerToken=jwt.decode(req.headers.authorization)
         const id=ownerToken.userId
-        driverDetails.find({deleteFlag:'false'},(err,data)=>{
-            if(err)throw err
-            console.log('line 73',data)
-            res.status(200).send({message:'your employee list',data})
+        driverDetails.find({driverId:id,deleteFlag:'false'},(err,data)=>{
+            if(data){
+                console.log('line 38',data)
+                res.status(200).send({message:'Your Own employee List',data})
+            }else{
+                res.status(400).send({message:'invalid token'})
+            }  
         })
     }catch(err){
         res.status(500).send({message:err.message})
@@ -47,10 +50,13 @@ exports.ownerGetOurOwnVehicleList=(req,res)=>{
     try{
         const ownerToken=jwt.decode(req.headers.authorization)
         const id=ownerToken.userId
-        vehicleDetails.find({deleteFlag:"false"},(err,data)=>{
-            if(err)throw err
-            console.log('line 45',data)
-            res.status(200).send({message:'Your Vehicle List',data})
+        vehicleDetails.find({vehicleId:id,deleteFlag:"false"},(err,data)=>{
+            if(data){
+                console.log('line 52',data)
+                res.status(200).send({message:'Your Own Vehicle List',data})
+            }else{
+                res.status(400).send({message:'invalid token'})
+            }  
         })
     }catch(err){
         res.status(500).send({message:err.message})
@@ -61,7 +67,7 @@ exports.getAllOwnerList=(req,res)=>{
     try{
         register.find({typeOfRole:'owner',deleteFlag:'false'}, (err, data) => {
             if(data){
-            console.log("line 88",data)
+                console.log("line 64",data)
                 res.status(200).send({ data: data })
             } else {
                 res.status(400).send({ message: 'your data is already deleted' })
@@ -77,15 +83,11 @@ exports.getSingleOwnerDetails=(req,res)=>{
     try{
     const ownerToken = jwt.decode(req.headers.authorization)
     const id = ownerToken.userId
-    console.log("line 107",ownerToken.userId)
-    console.log("line 108",id)
         register.findOne({_id:id},(err,data)=>{
-            console.log("line 109",data)
+            console.log("line 81",data)
             if (data.deleteFlag == "false") {
-                console.log("line 111",data)
                 res.status(200).send({ data: data })
             } else {
-                console.log('your data is already deleted')
                 res.status(400).send({ message: 'your data is already deleted' })
             }
 
@@ -98,18 +100,20 @@ exports.getSingleOwnerDetails=(req,res)=>{
 exports.updateOwnerProfile=(req,res)=>{
     try{
         const ownerToken = jwt.decode(req.headers.authorization)
-    const id = ownerToken.userId
-    console.log("line 129",ownerToken.userISd)
-    console.log("line 130",id)
+        const id = ownerToken.userId
         register.findOne({_id:id,deleteFlag:"false"},(err,data)=>{
-            if(err){throw err}
-            else{
-                console.log('line 134',data)
+            if(data){
                 register.findOneAndUpdate({_id:id},req.body,{new:true},(err,result)=>{
-                    if(err)throw err
+                    if(result){
                     console.log('line 137',result)
                     res.status(200).send({message:'profile update successfully',result})
+                    }else{
+                        res.status(400).send({message:'something wrong your data not updated'}) 
+                    }
                 })
+            }
+            else{
+                res.status(400).send({message:'invalid token'}) 
             }
         })
     }catch(err){
@@ -120,18 +124,18 @@ exports.updateOwnerProfile=(req,res)=>{
 exports.deleteOwnerProfile=(req,res)=>{
     try{
         const ownerToken = jwt.decode(req.headers.authorization)
-    const id = ownerToken.userId
-    console.log("line 151",ownerToken.userId)
-    console.log("line 152",id)
+         const id = ownerToken.userId
         register.findOne({_id:id,deleteFlag:"false"},(err,data)=>{
-            if(err){throw err}
-            else{
-                console.log('line 156',data)
+            if(data){
+                console.log('line 119',data)
                 register.findOneAndUpdate({_id:id},{deleteFlag:'true'},{returnOriginal:false},(err,result)=>{
                     if(err)throw err
-                    console.log('line 159',result)
+                    console.log('line 122',result)
                     res.status(200).send({message:'deleted successfully',result})
                 })
+            }
+            else{
+                res.status(400).send({message:'invalid token'}) 
             }
         })
     }catch(err){

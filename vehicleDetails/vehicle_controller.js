@@ -10,18 +10,9 @@ exports.addVehicleDetails=((req,res)=>{
         const id=ownerToken.userId
        console.log('line 12',id)
         req.body.vehicleId=id
-                // if(req.file==null||undefined){
-                //     req.body.vehicleImage=""
-                // }else{
-                // console.log('line 14',req.file.filename)
-                // req.body.vehicleImage = `http://192.168.0.112:6600/uploads/${req.file.filename}`
-                // }
                 register.findOne({_id:id,deleteFlag:'false'},(err,result)=>{
-                    if(err)throw err
-                    console.log('line 21',result._id)
-                    console.log('line 23',result)
+                    if(result){
                     req.body.vehicleOwner=result
-                    //req.body.vehicleDetails=JSON.parse(req.body.vehicleDetails)
                 vehicleDetails.create(req.body,(err,data)=>{
                     if(err){throw err}
                     else{
@@ -29,6 +20,7 @@ exports.addVehicleDetails=((req,res)=>{
                         res.status(200).send({message:"add vehicle successfully",data})
                     }
                 })
+            }else{res.status(400).send({message:'invalid Token'})}
                 })
                 
     }catch(err){
@@ -44,9 +36,10 @@ exports.vehicleDetailsImage=(req,res)=>{
         req.body.image = `http://192.168.0.112:6600/uploads/${req.file.filename}`
         }
         vehicleDetailsImage.create(req.body,(err,data)=>{
-            if(err)throw err
+            if(data){
             console.log('line 45',data)
             res.status(200).send({message:'Upload Image Successfull',data})
+            }else{res.status(400).send({message:'please upload chooseable format pdf/jpg/jpeg/png/txt'})}
         })
     }catch(err){
         res.status(500).send({message:err.message})
@@ -98,16 +91,22 @@ exports.updateVehicleDetails=(req,res)=>{
 
 exports.deleteVehicleDetails=(req,res)=>{
     try{
-        const ownerToken=jwt.decode(req.headers.authorization)
-        const id=ownerToken.userId
-        vehicleDetails.findOne({_id:req.params.id,deleteFlag:'false'},(err,datas)=>{
-            if(err)throw err
-            vehicleDetails.findOneAndUpdate({_id:req.params.id},{deleteFlag:'true'},{returnOriginal:false},(err,data)=>{
-                if(err)throw err
-                console.log('line 92',data)
-                res.status(200).send({message:'sucessfully delete your data',data})
+        if(req.headers.authorization){
+            vehicleDetails.findOne({_id:req.params.id,deleteFlag:'false'},(err,datas)=>{
+                if(datas){
+                    vehicleDetails.findOneAndUpdate({_id:req.params.id},{deleteFlag:'true'},{returnOriginal:false},(err,data)=>{
+                        if(err)throw err
+                        console.log('line 92',data)
+                        res.status(200).send({message:'sucessfully delete your data',data})
+                    })
+                }else{
+                    res.status(400).send({message:'invalid id'})
+                }
             })
-        })
+        }else{
+            res.status(400).send({message:'invalid token'})
+        }
+       
     }catch(err){
         res.status(500).send({message:err.message})
     }

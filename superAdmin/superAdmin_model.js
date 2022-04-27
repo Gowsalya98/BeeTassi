@@ -4,7 +4,9 @@ const superAdminSchema=mongoose.Schema({
     userName:String,
     email:String,
     password:String,
-    contact:String,
+    contact:Number,
+    newPassword:String,
+    confirmPassword:String,
     typeOfRole:{
         type:String,
         default:'superAdmin'
@@ -15,6 +17,14 @@ const superAdminSchema=mongoose.Schema({
     }
 })
 
-const superadmin=mongoose.model('superAdminSchema',superAdminSchema)
+const otpSchema=mongoose.Schema({
+    otp:Number,
+    superDetails:{
+        type:Object
+    }
+})
 
-module.exports={superadmin}
+const superadmin=mongoose.model('superAdminSchema',superAdminSchema)
+const sendOtp=mongoose.model('superAdminOtpSchema',otpSchema)
+
+module.exports={superadmin,sendOtp}

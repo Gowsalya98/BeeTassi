@@ -2,7 +2,9 @@ const mongoose=require('mongoose')
 
 const vehicleDetailsSchema=mongoose.Schema({
     noOfVehicle:Number,
-    vehicleImage:String,
+    vehicleImage:{
+        type:String,
+        default:""},
     vehicleDetails:[{
         vehicleType:String,
         vehicleNumber:String,

@@ -1,6 +1,7 @@
 const {payment}=require('./payment_model')
 const {register}=require('../register/register_model')
 const {makeId}=require('../userDetails/random_string')
+const razorpay=require('razorpay')
 const res = require('express/lib/response')
 
 exports.createPayment=(req,res)=>{
@@ -26,6 +27,24 @@ exports.createPayment=(req,res)=>{
     }catch(err){
         res.status(500).send({message:err.message})
     }
+}
+
+exports.createOrderId=async(req,res)=>{
+
+    var instance = new razorpay({ 
+        key_id: 'rzp_test_GUxQPzcyYr9u9P', 
+        key_secret: 'L33CkDSL2wI8qOHhIQRnZOoF' 
+    })
+
+  var options = {
+    amount: 100,  // amount in the smallest currency unit
+    currency: "INR",
+    receipt: "order_rcptid_11"
+  };
+  instance.orders.create(options, function(err, order) {
+    console.log('line 45',order);
+    res.send(order)
+  });
 }
 
 exports.getAllPaymentList=(req,res)=>{
