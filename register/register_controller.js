@@ -58,6 +58,7 @@ exports.login=(req,res)=>{
                 }else{
                     driverDetails.findOne({ email: req.body.email,deleteFlag:"false"},async (err, data) => {
                         console.log("line 60",data)
+                        if(data){
                         if (data.typeOfRole=='driver'){
                             const verifyPassword = await bcrypt.compare(req.body.password,data.password)
                             if (verifyPassword === true) {
@@ -71,7 +72,7 @@ exports.login=(req,res)=>{
                             
                         })
                     }else{res.send({message:'password does not match'})}
-                }
+                }}
                 })
                 
                 }

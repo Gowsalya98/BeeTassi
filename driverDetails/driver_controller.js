@@ -4,7 +4,7 @@ const jwt=require('jsonwebtoken')
 const bcrypt=require('bcrypt')
 const { userBooking } = require('../userDetails/user_model')
 
-exports.addDriver=((req,res)=>{
+exports.addDriver=(req,res)=>{
     try{
         console.log('line 8',req.body)
         driverDetails.countDocuments({email:req.body.email }, async (err, num) => {
@@ -12,7 +12,8 @@ exports.addDriver=((req,res)=>{
             if (num == 0) {
                 const ownerToken=jwt.decode(req.headers.authorization)
                 const id = ownerToken.userId
-                req.body.driverId=id
+                if(ownerToken.userId!=null){
+                    req.body.driverId=id
                 req.body.password = await bcrypt.hash(req.body.password, 10)
                 driverDetails.create(req.body,(err,data)=>{
                     if(err){throw err}
@@ -21,6 +22,9 @@ exports.addDriver=((req,res)=>{
                         res.status(200).send({message:"Register successfully",data})
                     }
                 })
+                }else{
+                    res.status(400).send({message:'please provide owner token'})
+            } 
             }else{
                 res.status(400).send({message:'Data already exists'})
             }
@@ -28,8 +32,7 @@ exports.addDriver=((req,res)=>{
     }catch(err){
         res.status(500).send({message:err.message})
     }
-})
-
+}
 
 exports.verifyUserOtp=(req,res)=>{
     try{
@@ -47,7 +50,7 @@ exports.verifyUserOtp=(req,res)=>{
                         res.status(400).send({message:'something wrong,please try again'})
                     }
                 })
-            }else{res.status(200).send({message:'unauthorized person otp invalid'})}
+            }else{res.status(200).send({message:'invalid id'})}
         })
             }else{
                 res.status(400).send({message:'unauthorized person otp invalid'})  
@@ -57,40 +60,66 @@ exports.verifyUserOtp=(req,res)=>{
         res.status(500).send({message:err.message})
     }
 }
-exports.getAllDriverList=((req,res)=>{
+
+exports.driverUpdateRideStatus=(req,res)=>{
+    try{
+        console.log('line 62',req.params);
+        userBooking.findOne({_id:req.params.userBookingId},(err,datas)=>{
+            if(datas){
+                console.log('line 65',datas);
+        userBooking.findOneAndUpdate({_id:req.params.userBookingId},{$set:{rideStatus:'rideFinish'}},{new:true},(err,result)=>{
+                    if(result){
+                        console.log('line 46',result)
+                        res.status(200).send({message:'your ride should be end successfully',result})
+                    }else{
+                        res.status(400).send({message:'something wrong,please try again'})
+                    }
+                })
+            }else{res.status(200).send({message:'invalid id'})}
+        })
+    }catch(err){
+        res.status(500).send({message:err.message})
+    }
+}
+
+exports.getAllDriverList=(req,res)=>{
     try{
         driverDetails.find({typeOfRole:"driver",deleteFlag:"false"},(err,data)=>{
             if(data){
+                data.sort().reverse()
                 console.log('line 58',data)
             res.status(200).send({data:data})
             }else{
-            res.status(400).send({message:'your data already deleted'})
+            res.status(400).send({message:'your data already deleted',data:[]})
             }
             
         })
     }catch(err){
         res.status(500).send({message:err.message})
     }
-})
+}
 
-exports.getSingleDriverData=((req,res)=>{
+exports.getSingleDriverData=(req,res)=>{
     try{
-        const driverToken=jwt.decode(req.headers.authorization)
-        const id=driverToken.userId
-        driverDetails.findOne({_id:id,deleteFlag:"false"},(err,data)=>{
-           if(data){
-            console.log('line 76',data)
-            res.status(200).send({data:data})
-           }else{
-               res.status(400).send({message:'invalid token'})
-           }
-        })
+    if(req.headers.authorization){
+        driverDetails.findOne({_id:req.params.id,deleteFlag:"false"},(err,data)=>{
+            if(data){
+             console.log('line 76',data)
+             res.status(200).send({data:data})
+            }else{
+                res.status(400).send({message:'invalid id',data:[]})
+            }
+         })
+       }else{
+           res.status(400).send({message:'unauthorized'})
+       }
+        
     }catch(err){
         res.status(500).send({message:err.message})
     }
-})
+}
 
-exports.updateDriverProfile=((req,res)=>{
+exports.updateDriverProfile=(req,res)=>{
     try{
         const driverToken=jwt.decode(req.headers.authorization)
         const id=driverToken.userId
@@ -109,9 +138,9 @@ exports.updateDriverProfile=((req,res)=>{
     }catch(err){
         res.status(500).send({message:err.message})
     }
-})
+}
 
-exports.deleteDriverProfile=((req,res)=>{
+exports.deleteDriverProfile=(req,res)=>{
     try{
        if(req.headers.authorization){
         driverDetails.findOne({_id:req.params.id,deleteFlag:"false"},(err,data)=>{
@@ -121,7 +150,7 @@ exports.deleteDriverProfile=((req,res)=>{
                         console.log('line 116',datas)
                     res.status(200).send({message:"sucessfully deleted your data",datas})
                     }else{
-                        res.status(400).send({message:'someyhing wrong your data not updated'})
+                        res.status(400).send({message:'something wrong your data not updated'})
                     }   
                 })
             }else{
@@ -135,4 +164,4 @@ exports.deleteDriverProfile=((req,res)=>{
     }catch(err){
         res.status(500).send({message:err.message})
     }
-})
+}

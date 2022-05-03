@@ -1,6 +1,7 @@
 const mongoose=require('mongoose')
 
 const paymentSchema=mongoose.Schema({
+    paymentId:String,
     accountHolderName:String,
     paymentId:String,
     bankName:String,
@@ -16,14 +17,15 @@ const paymentSchema=mongoose.Schema({
     },
     userDetails:{
         type:Object
-    },
-    deleteFlag:{
-        type:String,
-        default:"false"
     }
 })
 
-const payment=mongoose.model('paymentDetails',paymentSchema)
+const paymentIdSchema=mongoose.Schema({
+    paymentId:String
+})
 
-module.exports={payment}
+const payment=mongoose.model('paymentDetails',paymentSchema)
+const orderData=mongoose.model('paymentIdSchema',paymentIdSchema)
+
+module.exports={payment,orderData}
     

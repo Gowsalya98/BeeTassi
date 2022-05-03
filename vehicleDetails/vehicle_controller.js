@@ -49,9 +49,14 @@ exports.vehicleDetailsImage=(req,res)=>{
 exports.getAllVehicleList=(req,res)=>{
     try{
         vehicleDetails.find({deleteFlag:"false"},(err,data)=>{
-            if(err)throw err
-            console.log('line 57',data)
-            res.status(200).send(data)
+            if(err){
+                res.status(400).send({message:'failed',data:[]})
+            }else{
+                data.sort().reverse()
+                console.log('line 57',data)
+            res.status(200).send({message:'your data',data})
+            }
+            
         })
     }catch(err){
         res.status(500).send({message:err.message})
@@ -60,12 +65,20 @@ exports.getAllVehicleList=(req,res)=>{
 
 exports.getSingleVehicleDetails=(req,res)=>{
     try{
-        console.log('line 67',req.params.id)
+        if(req.headers.authorization){
+            console.log('line 67',req.params.id)
         vehicleDetails.findOne({_id:req.params.id,deleteFlag:'false'},(err,data)=>{
-            if(err)throw err
+            if(data){
             console.log('line 70',data)
             res.status(200).send(data)
+            }else{
+                res.status(400).send({message:'invalid id',data:[]})
+            }
         })
+        }else{
+            res.status(400).send({message:'invalid token'})
+        }
+        
     }catch(err){
         res.status(500).send({message:err.message})
     }

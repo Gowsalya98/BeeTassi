@@ -2,6 +2,7 @@
 const mongoose=require('mongoose')
 
 const userBookingSchema=mongoose.Schema({
+    createdAt:String,
     pickUpLocation:{
         pickUpLatitude:Number,
         pickUpLongitude:Number
@@ -19,7 +20,8 @@ const userBookingSchema=mongoose.Schema({
     },
     userDetails:{
        type:Object 
-    }
+    },
+    drop:String
 })
 
 const userBooking=mongoose.model('userBookingSchema',userBookingSchema)

@@ -6,7 +6,7 @@ router.get('/ownerGetOurOwnEmployeeList',ownerGetOurOwnEmployeeList)
 router.get('/ownerGetOurOwnVehicleList',ownerGetOurOwnVehicleList)
 
 router.get('/getAllOwnerList',getAllOwnerList)
-router.get('/getSingleOwnerDetails',getSingleOwnerDetails)
+router.get('/getSingleOwnerDetails/:id',getSingleOwnerDetails)
 
 router.put('/updateOwnerProfile',updateOwnerProfile)
 router.delete('/deleteOwnerProfile',deleteOwnerProfile)

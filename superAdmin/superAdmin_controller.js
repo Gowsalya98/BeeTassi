@@ -38,10 +38,10 @@ exports.superAdminLogin = async (req, res) => {
             console.log(err)
             return res.status(400).send({ errors: errors.array() })
         } else {
+            console.log('line 41',req.body);
             superadmin.findOne({ email: req.body.email }, async (err, data) => {
-                console.log('line 42',data)
-                if (data.typeOfRole=="superAdmin") {
-                    console.log('line 44',data)
+              if(data){
+                  console.log('line 44',data);
                     const password = await bcrypt.compare(req.body.password, data.password)
                     if (password == true) {
                         const userid = data._id
@@ -51,10 +51,10 @@ exports.superAdminLogin = async (req, res) => {
                     } else {
                         res.status(400).send({ message: "Incorrect Password" })
                     }
-
-                } else {
-                    res.status(400).send({ message: "invaild email" })
+                }else{
+                    res.status(400).send({ message: "invalid email & password" })
                 }
+
             })
         }
     } catch (err) {
@@ -120,7 +120,7 @@ exports.forgetPassword=(req,res)=>{
                                 console.log('line 116',response)
                                 res.status(200).send({ message: "verification otp send your email and your mobile number", otp,data,response})
                                 setTimeout(() => {
-                                        otpSchema.findOneAndDelete({ otp: otp }, (err, result) => {
+                                        sendOtp.findOneAndDelete({ otp: otp }, (err, result) => {
                                         console.log("line 120", result)
                                         if (err) { throw err }
                                     })

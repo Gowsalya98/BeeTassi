@@ -1,13 +1,13 @@
 const router=require('express').Router()
 
-const {createPayment,getAllPaymentList,getSinglePaymentDetails,superAdminPackageDetails,createOrderId}=require('./payment_controller')
+const {createPayment,getAllPaymentList,getSinglePaymentDetails,superAdminPackageDetails,createPaymentId}=require('./payment_controller')
 
-router.post('/createPayment/:id',createPayment)
-router.post('/createOrderId',createOrderId)
+router.post('/createPayment/:userBookingId',createPayment)
+router.get('/createPaymentId',createPaymentId)
 
 router.get('/getAllPaymentList',getAllPaymentList)
 router.get('/getSinglePaymentDetails/:id',getSinglePaymentDetails)
 
-router.get('/packageDetails',superAdminPackageDetails)
+router.get('/packageDetails/:userBookingId/:paymentId',superAdminPackageDetails)
 
 module.exports=router

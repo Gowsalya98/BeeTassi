@@ -35,6 +35,7 @@ exports.ownerGetOurOwnEmployeeList=(req,res)=>{
         const id=ownerToken.userId
         driverDetails.find({driverId:id,deleteFlag:'false'},(err,data)=>{
             if(data){
+                data.sort().reverse()
                 console.log('line 38',data)
                 res.status(200).send({message:'Your Own employee List',data})
             }else{
@@ -52,6 +53,7 @@ exports.ownerGetOurOwnVehicleList=(req,res)=>{
         const id=ownerToken.userId
         vehicleDetails.find({vehicleId:id,deleteFlag:"false"},(err,data)=>{
             if(data){
+                data.sort().reverse()
                 console.log('line 52',data)
                 res.status(200).send({message:'Your Own Vehicle List',data})
             }else{
@@ -67,6 +69,7 @@ exports.getAllOwnerList=(req,res)=>{
     try{
         register.find({typeOfRole:'owner',deleteFlag:'false'}, (err, data) => {
             if(data){
+                data.sort().reverse()
                 console.log("line 64",data)
                 res.status(200).send({ data: data })
             } else {
@@ -81,17 +84,21 @@ exports.getAllOwnerList=(req,res)=>{
 
 exports.getSingleOwnerDetails=(req,res)=>{
     try{
-    const ownerToken = jwt.decode(req.headers.authorization)
-    const id = ownerToken.userId
-        register.findOne({_id:id},(err,data)=>{
-            console.log("line 81",data)
-            if (data.deleteFlag == "false") {
-                res.status(200).send({ data: data })
-            } else {
-                res.status(400).send({ message: 'your data is already deleted' })
-            }
-
-        })
+        if(req.headers.authorization){
+            register.findById({_id:req.params.id},(err,data)=>{
+                if(err)throw err
+                console.log("line 81",data)
+                if (data.deleteFlag == "false") {
+                    res.status(200).send({ data: data })
+                } else {
+                    res.status(400).send({ message: 'your data is already deleted' })
+                }
+    
+            })
+        }else{
+            res.status(400).send({ message: 'unauthorized' }) 
+        }
+       
     }catch(err){
         res.status(500).send({message:err.message})
     }

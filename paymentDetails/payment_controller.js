@@ -1,58 +1,68 @@
-const {payment}=require('./payment_model')
-const {register}=require('../register/register_model')
+const {payment,orderData}=require('./payment_model')
+const {userBooking}=require('../userDetails/user_model')
 const {makeId}=require('../userDetails/random_string')
 const razorpay=require('razorpay')
 const res = require('express/lib/response')
+const { register } = require('../register/register_model')
 
-exports.createPayment=(req,res)=>{
-    console.log('line 5',req.body)
+exports.createPayment=async(req,res)=>{
     try{
-        register.findOne({_id:req.params.id,deleteFlag:'false'},(err,datas)=>{
-            if(err)throw err
-            req.body.userDetails=datas
-            const unique = makeId(5)
-            const date = Date.now().toString()
-            req.body.paymentId = unique + date
-            console.log('line 13',req.body.paymentId)
-            req.body.paymentOn=new Date().toLocaleString()
-                payment.create(req.body,(err,data)=>{
-                    if(err){throw err}
-                    else{
-                        console.log('line 14',data)
-                        res.status(200).send({message:"successfully payed",data})
-                    }
-                })
-        })
+        console.log('line 9',req.body)
+        const data=await userBooking.findOne({_id:req.params.userBookingId,deleteFlag:'false'})
+        if(data){
+            req.body.userDetails=data
+            payment.create(req.body,(err,result)=>{
+                if(err){res.status(400).send({message:'unsuccessfull payment'})}
+                else{
+                    console.log('line 16',result)
+                    res.status(200).send({message:"successfully payed",result})
+                }
+            })
+        }else{
+            res.status(400).send({message:'invalid id'})
+        }
         
     }catch(err){
         res.status(500).send({message:err.message})
     }
 }
 
-exports.createOrderId=async(req,res)=>{
+exports.createPaymentId=async(req,res)=>{
 
     var instance = new razorpay({ 
-        key_id: 'rzp_test_GUxQPzcyYr9u9P', 
-        key_secret: 'L33CkDSL2wI8qOHhIQRnZOoF' 
+        key_id: 'rzp_test_MzrI49KUp5riXp', 
+        key_secret: '3L5m9G0173xGRoQTudpISAXa' 
     })
 
   var options = {
-    amount: 100,  // amount in the smallest currency unit
+    amount: 100,  
     currency: "INR",
     receipt: "order_rcptid_11"
   };
   instance.orders.create(options, function(err, order) {
+      if(err){res.status(200).send({message:'unsuccessfull'})}
+      else{
     console.log('line 45',order);
-    res.send(order)
+        req.body.paymentId=order.id
+        orderData.create(req.body,(err,data)=>{
+            if(err)throw err
+            res.status(200).send({message:'successfully created your payment Id',data})
+        })
+   
+      }
   });
 }
 
 exports.getAllPaymentList=(req,res)=>{
     try{
         payment.find({deleteFlag:'false'},(err,data)=>{
-            if(err)throw err
-            console.log('line 29',data)
-            res.status(200).send({data:data})
+            if(data){
+                data.sort().reverse()
+                console.log('line 29',data)
+                res.status(200).send({data:data})
+            }else{
+                res.status(400).send({message:'data not found',data:[]})
+            }
         })
     }catch(err){
         res.status(500).send({message:err.message})
@@ -62,51 +72,38 @@ exports.getAllPaymentList=(req,res)=>{
 exports.getSinglePaymentDetails=(req,res)=>{
     try{
         payment.findOne({_id:req.params.id,deleteFlag:'false'},(err,data)=>{
-            if(err)throw err
-            console.log('line 41',data)
-            res.status(200).send({data:data})
+            if(data){
+                console.log('line 41',data)
+                res.status(200).send({data:data})
+            }else{
+                res.status(400).send({message:'data not found',data:[]})
+            }
+            
         })
     }catch(err){
         res.status(500).send({message:err.message})
     }
 }
 
-exports.superAdminPackageDetails=(req,res)=>{
+exports.superAdminPackageDetails=async(req,res)=>{
     try{
-        payment.find({rideStatus:"finish",deleteFlag:'false'},(err,data)=>{
-            if(err)throw err
-            console.log('line 59',data)
-            var datas=(data.price)*(10/100)
-            console.log('line 61',datas)
-            res.status(200).send(datas)
-        })
-            // var datas=data.filter((result)=>
-            // {
-            // if(data.price==70){
-            //     console.log('line 63',data.price)
-            //     var k=calculateCommission(5)
-            //     console.log('line 62',k)
-            //     return result
-            // }
-            // if(data.price>=70&&data.price<=200){
-            //     var k= calculateCommission(7)
-            //     console.log('line 65',k)
-            // }
-            // if(data.price<=200&&data.price>=1500){
-            //     var k=calculateCommission(10)
-            //     console.log('line 70',k)
-            // }
-            // if(data.price>=2000){
-            //     var k=calculateCommission(20)
-            //     console.log('line 74',k)
-            // }
-            //     })
+      const data=await payment.findOne({_id:req.params.paymentId})
+            if(data){
+                const datas=await userBooking.findOne({_id:req.params.userBookingId,rideStatus:'rideFinish'})
+                if(datas){
+                console.log('line 80',datas)
+                var result=(datas.price)*(10/100)
+                console.log('line 82',datas.price)
+                console.log('line 82',result)
+                res.status(200).send({message:'package send successfull',result})
+            }else{
+                res.status(400).send({message:'invalid payment id'})  
+            }
+       }else{
+          res.status(400).send({message:'invalid booking id'}) 
+       }
+        
     }catch(err){
          res.status(200).send({message:err.message})
     }
 }
-
-// function calculateCommission(commissionPercentage){
-//      var calculate=price/100*commissionPercentage
-//      console.log('line 76',calculate)
-// }

@@ -1,6 +1,7 @@
 const router=require('express').Router()
 
-const {addDriver,verifyUserOtp,getAllDriverList,getSingleDriverData,updateDriverProfile,deleteDriverProfile}=require('../driverDetails/driver_controller')
+const {addDriver,verifyUserOtp,driverUpdateRideStatus,getAllDriverList,getSingleDriverData,
+    updateDriverProfile,deleteDriverProfile}=require('../driverDetails/driver_controller')
 const{location}=require('./location_controller')
 
 const multer=require('../middleware/multer')
@@ -11,10 +12,13 @@ router.post('/addDriver',multer.upload.single('profileImage'),valid.validation,a
 //router.post('/login',valid.validation,login)
 router.get('/verifyUserOtp/:otp/:userBookingId',verifyUserOtp)
 
+//driver update ride finish or not
+router.get('/driverUpdateRideStatus/:userBookingId',driverUpdateRideStatus)
+
 router.get('/filterLocation/:latitude/:longitude',location)
 
 router.get('/getAllDriverList',getAllDriverList)
-router.get('/getSingleDriverData',getSingleDriverData)
+router.get('/getSingleDriverData/:id',getSingleDriverData)
 
 router.put('/updateDriverProfile',updateDriverProfile)
 router.delete('/deleteDriverProfile/:id',deleteDriverProfile)
