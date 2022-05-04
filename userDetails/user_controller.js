@@ -10,6 +10,7 @@ const {vehicleDetails}=require('../vehicleDetails/vehicle_model')
 exports.userBookingCab= async(req, res) => {
     try{
         console.log('line 12',req.body);
+        if(req.body!=null){
         const userToken=jwt.decode(req.headers.authorization)
         const id=userToken.userId
         register.findOne({_id:id,deleteFlag:"false"},(err,data)=>{
@@ -62,6 +63,7 @@ exports.userBookingCab= async(req, res) => {
              }
             
         })
+    }else{res.status(400).send('please provide valid details')}
    
 }catch(err){
     res.status(500).send({message:err.message})

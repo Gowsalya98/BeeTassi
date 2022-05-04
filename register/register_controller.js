@@ -55,26 +55,30 @@ exports.login=(req,res)=>{
                             res.status(200).send({ message: 'login successfull',token,data })
                         } else {res.status(400).send({ message: 'password does not match' })}
                     }else{res.status(400).send({message:"something wrong"})}
-                }else{
+                }else if(data==null){
                     driverDetails.findOne({ email: req.body.email,deleteFlag:"false"},async (err, data) => {
                         console.log("line 60",data)
-                        if(data){
+                        if(data!=null){
                         if (data.typeOfRole=='driver'){
-                            const verifyPassword = await bcrypt.compare(req.body.password,data.password)
-                            if (verifyPassword === true) {
+                            const password = await bcrypt.compare(req.body.password,data.password)
+                            console.log('line 64',password);
+                            //if (password == true) {
                                 const token = await jwt.sign({ userId: data._id }, process.env.SECRET_KEY)
                                 var Location={}
                                 Location.driverLatitude=data.driverLocation.driverLatitude
                                 Location.driverLongitude=data.driverLocation.driverLongitude
                                     req.body.driverLocation=Location
-                                    driverDetails.findOneAndUpdate({email:req.body.email,deleteFlag:"false"},req.body,{new:true},(err,datas)=>{
+                                    driverDetails.findOneAndUpdate({email:req.body.email,deleteFlag:"false"},{$set:req.body},{new:true},(err,datas)=>{
                                 res.status(200).send({ message: 'login successfull',token,datas })
                             
                         })
-                    }else{res.send({message:'password does not match'})}
-                }}
+                    //}else{res.send({message:'password does not match'})}
+                }else{res.send({message:'unauthorized'})}
+            }else{res.send({message:'data not found'})}
                 })
                 
+                }else{
+                    res.send({message:'invalid'})
                 }
         })
     } catch (error) {

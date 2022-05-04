@@ -43,8 +43,7 @@ const otpSchema=mongoose.Schema({
 
 const validation = [
     check('email').trim().isEmail().withMessage('email  must be valid'),
-    check('password').isLength({ min: 5}).withMessage('password must be minimum 5 character')
-    
+    check('password').isLength({ min: '5', max:'10'}).withMessage('password must be minimum 5 character')
 ]
 
 const register=mongoose.model('register',registerSchema)

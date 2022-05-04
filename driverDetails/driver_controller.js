@@ -11,8 +11,9 @@ exports.addDriver=(req,res)=>{
             console.log('line 10',num)
             if (num == 0) {
                 const ownerToken=jwt.decode(req.headers.authorization)
+                if(ownerToken!=undefined){
                 const id = ownerToken.userId
-                if(ownerToken.userId!=null){
+                console.log('line 16',id)
                     req.body.driverId=id
                 req.body.password = await bcrypt.hash(req.body.password, 10)
                 driverDetails.create(req.body,(err,data)=>{

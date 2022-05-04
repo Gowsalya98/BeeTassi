@@ -3,14 +3,19 @@ const mongoose=require('mongoose')
 const paymentSchema=mongoose.Schema({
     paymentId:String,
     accountHolderName:String,
-    paymentId:String,
     bankName:String,
     branchAddress:String,
     accountNumber:String,
     IFSCCode:String,
-    location:String,
-    paymentOn:String,
     amount:Number,
+    paymentOn:{
+        type:String,
+        default:'paid'
+    },
+    createdAt:{
+        type:Date,
+        default:new Date()
+    },
     transactionStatus: {
         type: String,
         default: "Success"
