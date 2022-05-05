@@ -87,14 +87,14 @@ exports.getSinglePaymentDetails=(req,res)=>{
 
 exports.superAdminPackageDetails=async(req,res)=>{
     try{
-      const data=await payment.findOne({_id:req.params.paymentId})
+      const data=await payment.findOne({paymentId:req.params.paymentId})
             if(data){
                 const datas=await userBooking.findOne({_id:req.params.userBookingId,rideStatus:'rideFinish'})
                 if(datas){
-                console.log('line 80',datas)
+                console.log('line 94',datas)
                 var result=(datas.price)*(10/100)
-                console.log('line 82',datas.price)
-                console.log('line 82',result)
+                console.log('line 96',datas.price)
+                console.log('line 97',result)
                 res.status(200).send({message:'package send successfull',result})
             }else{
                 res.status(400).send({message:'invalid payment id'})  

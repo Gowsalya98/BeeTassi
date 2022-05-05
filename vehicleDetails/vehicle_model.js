@@ -11,7 +11,11 @@ const vehicleDetailsSchema=mongoose.Schema({
         rcCopy:String,
         validIn:String,
         insuranceCopy:String,
-        insuranceValidIn:String
+        insuranceValidIn:String,
+        deleteFlag:{
+            type:String,
+            default:"false"
+        }
     }],
     vehicleId:String,
     vehicleOwner:{
