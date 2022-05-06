@@ -85,10 +85,8 @@ exports.getAllOwnerList=(req,res)=>{
 exports.getSingleOwnerDetails=(req,res)=>{
     try{
         if(req.headers.authorization){
-            register.findById({_id:req.params.id},(err,data)=>{
-                if(err)throw err
-                console.log("line 81",data)
-                if (data.deleteFlag == "false") {
+            register.findById({_id:req.params.id,deleteFlag:'false'},(err,data)=>{
+               if(data){
                     res.status(200).send({ data: data })
                 } else {
                     res.status(400).send({ message: 'your data is already deleted' })

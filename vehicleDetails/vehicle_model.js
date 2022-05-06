@@ -4,7 +4,8 @@ const vehicleDetailsSchema=mongoose.Schema({
     noOfVehicle:Number,
     vehicleImage:{
         type:String,
-        default:""},
+        default:""
+    },
     vehicleDetails:[{
         vehicleType:String,
         vehicleNumber:String,
