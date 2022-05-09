@@ -37,13 +37,13 @@ exports.addDriver=(req,res)=>{
 
 exports.verifyUserOtp=(req,res)=>{
     try{
-        console.log('line 36',req.params.otp)
-        sendOtp.findOne({otp:req.params.otp},(err,data)=>{
+        console.log('line 36',req.body.otp)
+        sendOtp.findOne({otp:req.body.otp},(err,data)=>{
              if(data){
                 console.log('line 39',data)
-         userBooking.findById({_id:req.params.userBookingId},(err,datas)=>{
+         userBooking.findById({_id:req.body.userBookingId},(err,datas)=>{
             if(datas){
-        userBooking.findOneAndUpdate({_id:req.params.userBookingId},{$set:{rideStatus:'rideStart'}},{new:true},(err,result)=>{
+        userBooking.findOneAndUpdate({_id:req.body.userBookingId},{$set:{rideStatus:'rideStart'}},{new:true},(err,result)=>{
                     if(result){
                         console.log('line 46',result)
                         res.status(200).send({message:'authorized person ride started successfully',result})
