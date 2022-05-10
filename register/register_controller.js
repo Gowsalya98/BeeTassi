@@ -60,16 +60,17 @@ exports.login=(req,res)=>{
                         console.log("line 60",data)
                         if(data!=null){
                         if (data.typeOfRole=='driver'){
-                            const password = await bcrypt.compare(req.body.password,data.password)
+                            const password=await bcrypt.compare(req.body.password,data.password)
                             console.log('line 64',password);
-                            //if (password == true) {
+                          //  if (password == true) {
                                 const token = await jwt.sign({ userId: data._id }, process.env.SECRET_KEY)
                                 var Location={}
-                                Location.driverLatitude=data.driverLocation.driverLatitude
-                                Location.driverLongitude=data.driverLocation.driverLongitude
+                                Location.driverLatitude=req.body.driverLocation.driverLatitude
+                                Location.driverLongitude=req.body.driverLocation.driverLongitude
                                     req.body.driverLocation=Location
-                                    driverDetails.findOneAndUpdate({email:req.body.email,deleteFlag:"false"},{$set:req.body},{new:true},(err,datas)=>{
-                                res.status(200).send({ message: 'login successfull',token,datas })
+                                    driverDetails.findOneAndUpdate({email:req.body.email,deleteFlag:"false"},req.body,{new:true},(err,datas)=>{
+                                        console.log('line 72',datas);
+                                            res.status(200).send({ message: 'login successfull',token,datas })
                             
                         })
                     //}else{res.send({message:'password does not match'})}
