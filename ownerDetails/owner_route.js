@@ -1,18 +1,23 @@
 const router=require('express').Router()
 
-const {search,getAllOwnerList,ownerGetOurOwnEmployeeList,ownerGetOurOwnVehicleList,getSingleOwnerDetails,updateOwnerProfile,deleteOwnerProfile}=require('./owner_controller')
+const ownerControl=require('./owner_controller')
 
-router.get('/ownerGetOurOwnEmployeeList',ownerGetOurOwnEmployeeList)
-router.get('/ownerGetOurOwnVehicleList',ownerGetOurOwnVehicleList)
+router.get('/ownerGetOurOwnEmployeeList',ownerControl.ownerGetOurOwnEmployeeList)
 
-router.get('/getAllOwnerList',getAllOwnerList)
-router.get('/getSingleOwnerDetails/:id',getSingleOwnerDetails)
+router.get('/ownerGetOurOwnVehicleList',ownerControl.ownerGetOurOwnVehicleList)
 
-router.put('/updateOwnerProfile',updateOwnerProfile)
-router.delete('/deleteOwnerProfile',deleteOwnerProfile)
+router.put('/ownerProfile',ownerControl.createOwnerProfileDetails)
+
+router.get('/getAllOwnerList',ownerControl.getAllOwnerList)
+
+router.get('/getSingleOwnerDetails/:id',ownerControl.getSingleOwnerDetails)
+
+router.put('/updateOwnerProfile',ownerControl.updateOwnerProfile)
+
+router.delete('/deleteOwnerProfile',ownerControl.deleteOwnerProfile)
 
 
-router.get('/search/:key',search)
+router.get('/search/:key',ownerControl.search)
 
 
 module.exports=router

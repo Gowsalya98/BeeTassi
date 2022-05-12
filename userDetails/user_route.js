@@ -1,21 +1,26 @@
 const router=require('express').Router()
 
-const {userBookingCab,getAllUserBookingDetails,getSingleUserBookingDetails,userSearch,
-    getAllUserList,getSingleUserDetails, updateUserProfile,deleteUserProfile}=require('./user_controller')
+const bookingControl=require('./user_controller')
 
 const validationResult=require('../middleware/register_validation')
 
-router.post('/userBookToCab',validationResult.validation,userBookingCab)
-router.get('/getAllUserBookingDetails',getAllUserBookingDetails)
-router.get('/getSingleUserBookingDetails/:userBookingId',getSingleUserBookingDetails)
+router.post('/userBookToCab',validationResult.validation,bookingControl.userBookingCab)
 
-router.get('/getAllUserList',getAllUserList)
-router.get('/getSingleUserDetails',getSingleUserDetails)
+router.get('/getAllUserBookingDetails',bookingControl.getAllUserBookingDetails)
 
-router.put('/updateUserProfile',updateUserProfile)
-router.delete('/deleteUserProfile',deleteUserProfile)
+router.get('/getSingleUserBookingDetails/:userBookingId',bookingControl.getSingleUserBookingDetails)
 
-router.get('/search/:key',userSearch)
+router.put('/userProfile',bookingControl.createUserprofileAccountDetails)
+
+router.get('/getAllUserList',bookingControl.getAllUserList)
+
+router.get('/getSingleUserDetails',bookingControl.getSingleUserDetails)
+
+router.put('/updateUserProfile',bookingControl.updateUserProfile)
+
+router.delete('/deleteUserProfile',bookingControl.deleteUserProfile)
+
+router.get('/search/:key',bookingControl.userSearch)
 
 
 module.exports=router

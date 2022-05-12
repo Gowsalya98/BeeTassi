@@ -2,24 +2,40 @@ const mongoose=require('mongoose')
 const {check}=require('express-validator')
 
 const registerSchema=mongoose.Schema({
-
     name:String,
-    companyName:String,
     email:String,
     password:String,
+    firstName:{
+        type:String,
+        default:""
+    },
+    lastName:{
+        type:String,
+        default:""
+    },
+    alternativePhoneNumber:{
+        type:Number,
+        default:""
+    },
+    city:{
+        type:String,
+        default:""
+    },
+    pincode:{
+        type:Number,
+        default:""
+    },
     newPassword:String,
     confirmPassword:String,
-    contact:Number,
+    contact:{
+        type:Number,
+        default:""
+    },
     profileImage:{
         type:String,
         default:""
     },
-    typeOfVehicle:String,
     typeOfRole:String,
-    address:String,
-    location:String,
-    userId:String,
-    ownerId:String,
     deleteFlag:{
         type:String,
         default:false

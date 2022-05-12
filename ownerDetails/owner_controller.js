@@ -6,7 +6,7 @@ const{vehicleDetails}=require('../vehicleDetails/vehicle_model')
 const jwt=require('jsonwebtoken')
 
 
-exports.search = async(req, res) => {
+const search = async(req, res) => {
     console.log(req.params.key)
     try {
             const data=await register.find({
@@ -29,7 +29,33 @@ exports.search = async(req, res) => {
         res.status(400).send({ message: err.message })
     }
 }
-exports.ownerGetOurOwnEmployeeList=(req,res)=>{
+
+const createOwnerProfileDetails=(req,res)=>{
+    try{
+        const ownerToken = jwt.decode(req.headers.authorization)
+        const id = ownerToken.userId
+        register.findOne({_id:id,deleteFlag:"false"},(err,data)=>{
+            if(data.typeOfRole=='owner'){
+                req.body.firstName=data.name
+                register.findOneAndUpdate({_id:id},req.body,{new:true},(err,result)=>{
+                    if(result){
+                    console.log('line 137',result)
+                    res.status(200).send({message:'profile update successfully',result})
+                    }else{
+                        res.status(400).send({message:'something wrong your data not updated'}) 
+                    }
+                })
+            }
+            else{
+                res.status(400).send({message:'invalid token'}) 
+            }
+        })
+    }catch(err){
+        res.status(500).send({message:'internal server error'})
+    }
+}
+
+const ownerGetOurOwnEmployeeList=(req,res)=>{
     try{
         const ownerToken=jwt.decode(req.headers.authorization)
         const id=ownerToken.userId
@@ -47,7 +73,7 @@ exports.ownerGetOurOwnEmployeeList=(req,res)=>{
     }
 }
 
-exports.ownerGetOurOwnVehicleList=(req,res)=>{
+const ownerGetOurOwnVehicleList=(req,res)=>{
     try{
         const ownerToken=jwt.decode(req.headers.authorization)
         const id=ownerToken.userId
@@ -65,7 +91,7 @@ exports.ownerGetOurOwnVehicleList=(req,res)=>{
     }
 }
 
-exports.getAllOwnerList=(req,res)=>{
+const getAllOwnerList=(req,res)=>{
     try{
         register.find({typeOfRole:'owner',deleteFlag:'false'}, (err, data) => {
             if(data){
@@ -82,7 +108,7 @@ exports.getAllOwnerList=(req,res)=>{
     }
 }
 
-exports.getSingleOwnerDetails=(req,res)=>{
+const getSingleOwnerDetails=(req,res)=>{
     try{
         if(req.headers.authorization){
             register.findById({_id:req.params.id,deleteFlag:'false'},(err,data)=>{
@@ -102,7 +128,7 @@ exports.getSingleOwnerDetails=(req,res)=>{
     }
 }
 
-exports.updateOwnerProfile=(req,res)=>{
+const updateOwnerProfile=(req,res)=>{
     try{
         const ownerToken = jwt.decode(req.headers.authorization)
         const id = ownerToken.userId
@@ -126,7 +152,7 @@ exports.updateOwnerProfile=(req,res)=>{
     }
 }
 
-exports.deleteOwnerProfile=(req,res)=>{
+const deleteOwnerProfile=(req,res)=>{
     try{
         const ownerToken = jwt.decode(req.headers.authorization)
          const id = ownerToken.userId
@@ -146,4 +172,15 @@ exports.deleteOwnerProfile=(req,res)=>{
     }catch(err){
         res.status(500).send({message:err.message})
     }
+}
+
+
+module.exports={
+    search,ownerGetOurOwnEmployeeList,
+    ownerGetOurOwnVehicleList,
+    createOwnerProfileDetails,
+    getAllOwnerList,
+    getSingleOwnerDetails,
+    updateOwnerProfile,
+    deleteOwnerProfile
 }

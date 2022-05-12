@@ -1,4 +1,3 @@
-
 const fast2sms=require('fast-two-sms')
 const jwt=require('jsonwebtoken')
 const nodeGeocoder = require('node-geocoder');
@@ -7,7 +6,7 @@ const {userBooking}=require('./user_model')
 const { register,sendOtp} = require('../register/register_model')
 const {vehicleDetails}=require('../vehicleDetails/vehicle_model')
 
-exports.userBookingCab= async(req, res) => {
+const userBookingCab= async(req, res) => {
     try{
         console.log('line 12',req.body);
         if(req.body!=null){
@@ -91,7 +90,7 @@ exports.userBookingCab= async(req, res) => {
         return Value * Math.PI / 180;
     }
  
-exports.getAllUserBookingDetails=async(req,res)=>{
+const getAllUserBookingDetails=async(req,res)=>{
     try{
        if(req.headers.authorization){
         const data=await userBooking.find({})
@@ -110,7 +109,7 @@ exports.getAllUserBookingDetails=async(req,res)=>{
         res.status(500).send({success:'false',message:'internal server error'})
     }
 }
-exports.getSingleUserBookingDetails=async(req,res)=>{
+const getSingleUserBookingDetails=async(req,res)=>{
     try{
         if(req.headers.authorization){
          const data=await userBooking.findOne({_id:req.params.userBookingId})
@@ -128,7 +127,7 @@ exports.getSingleUserBookingDetails=async(req,res)=>{
          res.status(500).send({success:'false',message:'internal server error'})
      }
 }
-exports.userSearch=async(req,res)=>{
+const userSearch=async(req,res)=>{
     try{
         const data=await vehicleDetails.find({
             "$or":
@@ -142,7 +141,30 @@ exports.userSearch=async(req,res)=>{
         res.status(500).send({success:'false',message:'internal server error'})
     }
 }
-exports.getAllUserList=async(req,res)=>{
+
+const createUserprofileAccountDetails=async(req,res)=>{
+    try{
+        const token=jwt.decode(req.headers.authorization)
+                const id=token.userId
+        const result=await register.findById({_id:id,deleteFlag:'false'})
+        if(result.typeOfRole=='user'){
+                req.body.firstName=result.name
+        const data=await register.findByIdAndUpdate({_id:id,deleteFlag:'false'},req.body,{new:true})
+               if (data) {
+                res.status(200).send({ success:'true',message:'your profile save',data:data });
+              } else {
+                res.status(302).send({ success:'false',message:'invalid token' });
+              }
+            }else{
+                res.status(302).send({success:'false',message:'invaild id'})
+            }
+    }catch(err){
+        console.log(err);
+        res.status(500).send({message:'internal server error'})
+    }
+}
+
+const getAllUserList=async(req,res)=>{
     try{
        const data= await register.aggregate([{$match:{$and:[{typeOfRole:"user",deleteFlag:"false"}]}}])
             if(data){
@@ -157,7 +179,7 @@ exports.getAllUserList=async(req,res)=>{
     }
 }
 
-exports.getSingleUserDetails=(req,res)=>{
+const getSingleUserDetails=(req,res)=>{
     try{
         const token = jwt.decode(req.headers.authorization)
         const id = token.userId
@@ -175,11 +197,11 @@ exports.getSingleUserDetails=(req,res)=>{
 }
 
     
-exports.updateUserProfile=async(req,res)=>{
+const updateUserProfile=async(req,res)=>{
     try{
             const token=jwt.decode(req.headers.authorization)
                 const id=token.userId
-        let data=await register.findByIdAndUpdate({_id:id,deleteFlag:'false'},{$set:req.body},{new:true})
+        let data=await register.findByIdAndUpdate({_id:id,deleteFlag:'false'},req.body,{new:true})
                if (data) {
                 res.status(200).send({ success:'true',message:'update user profile successfully',data: data });
               } else {
@@ -190,7 +212,7 @@ exports.updateUserProfile=async(req,res)=>{
     }
 }
 
-exports.deleteUserProfile=(req,res)=>{
+const deleteUserProfile=(req,res)=>{
     try{
         const token = jwt.decode(req.headers.authorization)
         const id = token.userId
@@ -208,4 +230,10 @@ exports.deleteUserProfile=(req,res)=>{
     }catch(err){
         res.status(500).send({success:'false',message:'internal server error'})
     }
+}
+
+
+module.exports={
+    userBookingCab,getAllUserBookingDetails,getSingleUserBookingDetails,userSearch,createUserprofileAccountDetails,
+    getAllUserList,getSingleUserDetails,updateUserProfile,deleteUserProfile
 }
