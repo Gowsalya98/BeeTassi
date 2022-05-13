@@ -1,15 +1,19 @@
 const mongoose=require('mongoose')
 
 const driverSchema=mongoose.Schema({
-    companyName:String,
-    candidateName:String,
+    createdAt:{
+        type:Date,
+        default:Date.now()
+    },
+    driverName:String,
     email:String,
     password:String,
     contact:Number,
     profileImage:String,
     drivingLicense:String,
-    licenseValidIn:String,
-    typeOfVehicle:String,
+    frontImageLicense:String,
+    backImageLicense:String,
+    carRegNumber:String,
     driverId:String,
     driverLocation:{
         driverLatitude:{

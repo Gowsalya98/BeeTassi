@@ -1,23 +1,23 @@
 
-const {vehicleDetails,vehicleDetailsImage}=require('./vehicle_model')
+const {cabDetails,cabImage}=require('./vehicle_model')
 const {register}=require('../register/register_model')
 const jwt=require('jsonwebtoken')
 
-exports.addVehicleDetails=((req,res)=>{
+exports.addCabDetails=((req,res)=>{
     try{
         console.log('line 8',req.body)
         const ownerToken=jwt.decode(req.headers.authorization)
         const id=ownerToken.userId
        console.log('line 12',id)
-        req.body.vehicleId=id
+        req.body.cabId=id
                 register.findOne({_id:id,deleteFlag:'false'},(err,result)=>{
                     if(result){
-                    req.body.vehicleOwner=result
-                vehicleDetails.create(req.body,(err,data)=>{
+                    req.body.cabOwner=result
+                cabDetails.create(req.body,(err,data)=>{
                     if(err){throw err}
                     else{
                         console.log('line 28',data)
-                        res.status(200).send({message:"add vehicle successfully",data})
+                        res.status(200).send({message:"add cab successfully",data})
                     }
                 })
             }else{res.status(400).send({message:'invalid Token'})}
@@ -28,14 +28,14 @@ exports.addVehicleDetails=((req,res)=>{
     }
 })
 
-exports.vehicleDetailsImage=(req,res)=>{
+exports.cabDetailImage=(req,res)=>{
     try{
         if(req.file==undefined||null){
             req.body.image=""
         }else{
         req.body.image = `http://192.168.0.112:6600/uploads/${req.file.filename}`
         }
-        vehicleDetailsImage.create(req.body,(err,data)=>{
+        cabImage.create(req.body,(err,data)=>{
             if(data){
             console.log('line 45',data)
             res.status(200).send({message:'Upload Image Successfull',data})
@@ -46,9 +46,9 @@ exports.vehicleDetailsImage=(req,res)=>{
     }
 }
 
-exports.getAllVehicleList=(req,res)=>{
+exports.getAllCabList=(req,res)=>{
     try{
-        vehicleDetails.find({deleteFlag:"false"},(err,data)=>{
+        cabDetails.find({deleteFlag:"false"},(err,data)=>{
             if(err){
                 res.status(400).send({message:'failed',data:[]})
             }else{
@@ -63,11 +63,11 @@ exports.getAllVehicleList=(req,res)=>{
     }
 }
 
-exports.getSingleVehicleDetails=(req,res)=>{
+exports.getSingleCabDetails=(req,res)=>{
     try{
         if(req.headers.authorization){
             console.log('line 67',req.params.id)
-        vehicleDetails.findOne({_id:req.params.id,deleteFlag:'false'},(err,data)=>{
+        cabDetails.findOne({_id:req.params.id,deleteFlag:'false'},(err,data)=>{
             if(data){
             console.log('line 70',data)
             res.status(200).send(data)
@@ -84,17 +84,17 @@ exports.getSingleVehicleDetails=(req,res)=>{
     }
 }
 
-exports.updateVehicleDetails=(req,res)=>{
+exports.updateCabDetails=(req,res)=>{
     try{
         const ownerToken=jwt.decode(req.headers.authorization)
         const id=ownerToken.userId
-        vehicleDetails.findOne({vehicleId:id,deleteFlag:'false'},(err,datas)=>{
+        cabDetails.findOne({cabId:id,deleteFlag:'false'},(err,datas)=>{
             if(err)throw err
             console.log('line 87',datas)
-            vehicleDetails.findOneAndUpdate({vehicleId:id},req.body,{new:true},(err,data)=>{
+            cabDetails.findOneAndUpdate({cabId:id},req.body,{new:true},(err,data)=>{
                 if(err)throw err
                 console.log('line 90',data)
-                res.status(200).send({message:'sucessfully update vehicle details',data})
+                res.status(200).send({message:'sucessfully update cab details',data})
             })
         })
     }catch(err){
@@ -102,12 +102,12 @@ exports.updateVehicleDetails=(req,res)=>{
     }
 }
 
-exports.deleteVehicleDetails=(req,res)=>{
+exports.deleteCabDetails=(req,res)=>{
     try{
         if(req.headers.authorization){
-            vehicleDetails.findOne({_id:req.params.id,deleteFlag:'false'},(err,datas)=>{
+            cabDetails.findOne({_id:req.params.id,deleteFlag:'false'},(err,datas)=>{
                 if(datas){
-                    vehicleDetails.findOneAndUpdate({_id:req.params.id},{deleteFlag:'true'},{returnOriginal:false},(err,data)=>{
+                    cabDetails.findOneAndUpdate({_id:req.params.id},{deleteFlag:'true'},{returnOriginal:false},(err,data)=>{
                         if(err)throw err
                         console.log('line 92',data)
                         res.status(200).send({message:'sucessfully delete your data',data})

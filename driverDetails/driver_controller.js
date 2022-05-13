@@ -1,5 +1,6 @@
 const {driverDetails}=require('./driver_model')
 const {sendOtp}=require('../register/register_model')
+const nodemailer=require('nodemailer')
 const jwt=require('jsonwebtoken')
 const bcrypt=require('bcrypt')
 const { userBooking } = require('../userDetails/user_model')
@@ -15,12 +16,14 @@ exports.addDriver=(req,res)=>{
                 const id = ownerToken.userId
                 console.log('line 16',id)
                     req.body.driverId=id
+                    const driverPassword=req.body.password
                 req.body.password = await bcrypt.hash(req.body.password, 10)
                 driverDetails.create(req.body,(err,data)=>{
                     if(err){throw err}
-                    else{
+                     else{
+                        postMail( data.email, 'BeeTassi=>your job confirm your login details below here',"email:"+req.body.email+','+"password:"+driverPassword+','+"CabRegisterNumber:"+req.body.carRegNumber)
                         console.log('line 19',data)
-                        res.status(200).send({message:"Register successfully",data})
+                        res.status(200).send({message:"Register successfully,mail send successfully",data})
                     }
                 })
                 }else{
@@ -34,7 +37,21 @@ exports.addDriver=(req,res)=>{
         res.status(500).send({message:err.message})
     }
 }
-
+let transport = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'nishagowsalya339@gmail.com',
+        pass: '8760167075'
+    }
+})
+const postMail = function ( to, subject, text) {
+    return transport.sendMail({
+        from: 'nishagowsalya339@gmail.com',
+        to: to,
+        subject: subject,
+        text:text
+    })
+}
 exports.verifyUserOtp=(req,res)=>{
     try{
         console.log('line 36',req.body.otp)

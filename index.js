@@ -15,6 +15,7 @@ const driverDetails  = require('./driverDetails/driver_route')
 const vehicleDetails =require('./vehicleDetails/vehicle_route')
 const payment=require('./paymentDetails/payment_route')
 const report=require('./reportDetails/report_route')
+const contactUs=require('./contactUs/contact_route')
 
 app.use(cors())
 app.use(express.urlencoded({ extended: true }))
@@ -29,7 +30,7 @@ app.use('/BeeTassi/driverDetails',driverDetails)
 app.use('/BeeTassi/vehicleDetails',vehicleDetails)
 app.use('/BeeTassi/payment',payment)
 app.use('/BeeTassi/report',report)
-
+app.use('/BeeTassi/contactUs',contactUs)
 
 app.get('/',(req,res)=>{
     res.send('welcome BeeTassi')

@@ -1,25 +1,38 @@
 const mongoose=require('mongoose')
 
-const vehicleDetailsSchema=mongoose.Schema({
-    noOfVehicle:Number,
-    vehicleImage:{
-        type:String,
-        default:""
+const cabDetailsSchema=mongoose.Schema({
+    // noOfVehicle:Number,
+    // vehicleImage:{
+    //     type:String,
+    //     default:""
+    // },
+    // vehicleDetails:[{
+    //     vehicleType:String,
+    //     vehicleNumber:String,
+    //     rcCopy:String,
+    //     validIn:String,
+    //     insuranceCopy:String,
+    //     insuranceValidIn:String,
+    //     deleteFlag:{
+    //         type:String,
+    //         default:"false"
+    //     }
+    // }],
+    carModel:String,
+    carBrand:String,
+    carImage:String,
+    numberOfSeats:Number,
+    carRegNumber:String,
+    perDayPrice:Number,
+    rcBookNumber:String,
+    frontRcBookImage:String,
+    backRcBookImage:String,
+    cabId:String,
+    createdAt:{
+        type:Date,
+        default:new Date()
     },
-    vehicleDetails:[{
-        vehicleType:String,
-        vehicleNumber:String,
-        rcCopy:String,
-        validIn:String,
-        insuranceCopy:String,
-        insuranceValidIn:String,
-        deleteFlag:{
-            type:String,
-            default:"false"
-        }
-    }],
-    vehicleId:String,
-    vehicleOwner:{
+    cabOwner:{
         type:Object
     },
     deleteFlag:{
@@ -28,11 +41,11 @@ const vehicleDetailsSchema=mongoose.Schema({
     }
 })
 
-const vehicleDetailsImageSchema=mongoose.Schema({
+const cabImageSchema=mongoose.Schema({
     image:String
 })
 
-const vehicleDetails=mongoose.model('vehicleDetails',vehicleDetailsSchema)
-const vehicleDetailsImage=mongoose.model('vehicleDetailsImage',vehicleDetailsImageSchema)
+const cabDetails=mongoose.model('cabDetails',cabDetailsSchema)
+const cabImage=mongoose.model('cabImageSchema',cabImageSchema)
 
-module.exports={vehicleDetails,vehicleDetailsImage}
+module.exports={cabDetails,cabImage}

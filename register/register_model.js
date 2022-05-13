@@ -36,6 +36,10 @@ const registerSchema=mongoose.Schema({
         default:""
     },
     typeOfRole:String,
+    createdAt:{
+        type:Date,
+        default:new Date()
+    },
     deleteFlag:{
         type:String,
         default:false

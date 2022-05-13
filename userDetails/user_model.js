@@ -2,10 +2,7 @@
 const mongoose=require('mongoose')
 
 const userBookingSchema=mongoose.Schema({
-    createdAt:{
-        type:Date,
-        default: new Date()
-    },
+    createdAt:String,
     pickUpLocation:{
         pickUpLatitude:Number,
         pickUpLongitude:Number
@@ -14,7 +11,12 @@ const userBookingSchema=mongoose.Schema({
         dropLatitude:Number,
         dropLongitude:Number
     },
-    selectVehicle:String,
+    contact:Number,
+    selectCab:String,
+    selectDate:String,
+    selectTiming:String,
+    selectSeats:Number,
+    payOption:String,
     travelDistance:String,
     price:Number,
     rideStatus:{

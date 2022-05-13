@@ -1,7 +1,7 @@
 
 const {register}=require('../register/register_model')
 const {driverDetails}=require('../driverDetails/driver_model')
-const{vehicleDetails}=require('../vehicleDetails/vehicle_model')
+const{cabDetails}=require('../vehicleDetails/vehicle_model')
 
 const jwt=require('jsonwebtoken')
 
@@ -77,7 +77,7 @@ const ownerGetOurOwnVehicleList=(req,res)=>{
     try{
         const ownerToken=jwt.decode(req.headers.authorization)
         const id=ownerToken.userId
-        vehicleDetails.find({vehicleId:id,deleteFlag:"false"},(err,data)=>{
+        cabDetails.find({cabId:id,deleteFlag:"false"},(err,data)=>{
             if(data){
                 data.sort().reverse()
                 console.log('line 52',data)

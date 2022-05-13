@@ -4,7 +4,7 @@ const nodeGeocoder = require('node-geocoder');
 const { randomString } = require('./random_string')
 const {userBooking}=require('./user_model')
 const { register,sendOtp} = require('../register/register_model')
-const {vehicleDetails}=require('../vehicleDetails/vehicle_model')
+const {cabDetails}=require('../vehicleDetails/vehicle_model')
 
 const userBookingCab= async(req, res) => {
     try{
@@ -129,10 +129,10 @@ const getSingleUserBookingDetails=async(req,res)=>{
 }
 const userSearch=async(req,res)=>{
     try{
-        const data=await vehicleDetails.find({
+        const data=await cabDetails.find({
             "$or":
-                [{ "vehicleDetails.vehicleType": { $regex: req.params.key } },
-                { "vehicleDetails.vehicleNumber": { $regex: req.params.key } }
+                [{ "cabDetails.carModel": { $regex: req.params.key } },
+                { "cabDetails.numberOfSeats": { $regex: req.params.key } }
                 ]
         })
         console.log('line 134',data);
