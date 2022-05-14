@@ -35,6 +35,10 @@ const cabDetailsSchema=mongoose.Schema({
     cabOwner:{
         type:Object
     },
+    cabStatus:{
+        type:String,
+        default:'available'
+    },
     deleteFlag:{
         type:String,
         default:"false"

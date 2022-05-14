@@ -62,6 +62,21 @@ exports.getAllCabList=(req,res)=>{
         res.status(500).send({message:err.message})
     }
 }
+exports.getAllAvailableCabList=(req,res)=>{
+    try{
+        cabDetails.find({cabStatus:'available',deleteFlag:'false'},(err,data)=>{
+            if(err){
+                res.status(400).send({message:'failed',data:[]})
+            }else{
+                data.sort().reverse()
+                console.log('line 72',data);
+                res.status(200).send({message:'available cab list',data})
+            }
+        })
+    }catch(err){
+        res.status(500).send({message:err.message})
+    }
+}
 
 exports.getSingleCabDetails=(req,res)=>{
     try{

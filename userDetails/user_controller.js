@@ -46,12 +46,19 @@ const userBookingCab= async(req, res) => {
                                           console.log('line 43',req.body.price)
                                                req.body.userDetails=data
                                                req.body.createdAt=new Date().toString().substring(0,10)
-                                               console.log('line 46',req.body);
-                                           userBooking.create(req.body,async(err,result)=>{
-                                                if(err)throw err
-                                                console.log('line 49',result)
-                                        const response = await fast2sms.sendMessage({ authorization: process.env.OTPKEY,message:otp,numbers:[req.body.contact]})
-                                            res.status(200).send({ message: "verification otp send your mobile number",otp,result})
+                                                cabDetails.findOne({carModel:req.body.selectCab,deleteFlag:'false'},async(err,cab)=>{
+                                                   if(cab){
+                                                    const cabdl=await cabDetails.findOneAndUpdate({carModel:req.body.selectCab},{$set:{cabStatus:'booking'}},{new:true})
+                                                    if(cabdl){
+                                                        console.log('line 53',cabdl);
+                                                        console.log('line 46',req.body);
+                                                        userBooking.create(req.body,async(err,result)=>{
+                                                            if(err)throw err
+                                                        const response = await fast2sms.sendMessage({ authorization: process.env.OTPKEY,message:otp,numbers:[req.body.contact]})
+                                                        res.status(200).send({ message: "verification otp send your mobile number",otp,result:result,cabdetails:cabdl})
+                                                        })
+                                                    }else{res.status(400).send({message:'does not update'})}
+                                                   }else{res.status(400).send({message:'invaild id'})}
                                             })
                                       }else{
                                           res.status(400).send('something wrong')
@@ -109,6 +116,7 @@ const getAllUserBookingDetails=async(req,res)=>{
         res.status(500).send({success:'false',message:'internal server error'})
     }
 }
+
 const getSingleUserBookingDetails=async(req,res)=>{
     try{
         if(req.headers.authorization){
@@ -127,6 +135,7 @@ const getSingleUserBookingDetails=async(req,res)=>{
          res.status(500).send({success:'false',message:'internal server error'})
      }
 }
+
 const userSearch=async(req,res)=>{
     try{
         const data=await cabDetails.find({
