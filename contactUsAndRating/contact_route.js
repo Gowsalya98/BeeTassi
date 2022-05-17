@@ -8,4 +8,9 @@ router.get('/getAllContactUsList',contactUsControl.getAllContactUsList)
 
 router.get('/getSingleContactUsDetails/:id',contactUsControl.getSingleContactUsDetails)
 
+
+//rating
+
+router.post('/rating',contactUsControl.ratingForCab)
+
 module.exports=router

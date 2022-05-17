@@ -77,7 +77,7 @@ const ownerGetOurOwnVehicleList=(req,res)=>{
     try{
         const ownerToken=jwt.decode(req.headers.authorization)
         const id=ownerToken.userId
-        cabDetails.find({cabId:id,deleteFlag:"false"},(err,data)=>{
+        cabDetails.find({cabOwnerId:id,deleteFlag:"false"},(err,data)=>{
             if(data){
                 data.sort().reverse()
                 console.log('line 52',data)

@@ -13,11 +13,11 @@ const userBookingCab= async(req, res) => {
         const userToken=jwt.decode(req.headers.authorization)
         const id=userToken.userId
         register.findOne({_id:id,deleteFlag:"false"},(err,data)=>{
-                if(data.contact==req.body.contact){
+                if(data){
                      const otp = randomString(3)
                                   console.log("otp", otp)
-                                  const userDetails=data
-                                  sendOtp.create({otp: otp,userDetails:userDetails},async(err, datas) => {
+                                 req.body.userDetails=data
+                                  sendOtp.create({otp: otp,userDetails:req.body.userDetails},async(err, datas) => {
                                       if(err){throw err}
                                       if (datas) {
                                         let options = { provider: 'openstreetmap'}
@@ -44,14 +44,13 @@ const userBookingCab= async(req, res) => {
                                           const count=rate*req.body.travelDistance
                                           req.body.price=count
                                           console.log('line 43',req.body.price)
-                                               req.body.userDetails=data
                                                req.body.createdAt=new Date().toString().substring(0,10)
                                                 cabDetails.findOne({carModel:req.body.selectCab,deleteFlag:'false'},async(err,cab)=>{
                                                    if(cab){
                                                     const cabdl=await cabDetails.findOneAndUpdate({carModel:req.body.selectCab},{$set:{cabStatus:'booking'}},{new:true})
                                                     if(cabdl){
                                                         console.log('line 53',cabdl);
-                                                        console.log('line 46',req.body);
+                                                        console.log('line 54',req.body);
                                                         userBooking.create(req.body,async(err,result)=>{
                                                             if(err)throw err
                                                         const response = await fast2sms.sendMessage({ authorization: process.env.OTPKEY,message:otp,numbers:[req.body.contact]})
@@ -65,7 +64,7 @@ const userBookingCab= async(req, res) => {
                                       }
                                      })             
              }else{
-                 res.status(400).send('please check your contact number')
+                 res.status(400).send('something error please check it')
              }
             
         })

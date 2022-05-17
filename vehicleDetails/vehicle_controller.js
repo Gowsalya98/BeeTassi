@@ -9,7 +9,7 @@ exports.addCabDetails=((req,res)=>{
         const ownerToken=jwt.decode(req.headers.authorization)
         const id=ownerToken.userId
        console.log('line 12',id)
-        req.body.cabId=id
+        req.body.cabOwnerId=id
                 register.findOne({_id:id,deleteFlag:'false'},(err,result)=>{
                     if(result){
                     req.body.cabOwner=result
@@ -103,10 +103,10 @@ exports.updateCabDetails=(req,res)=>{
     try{
         const ownerToken=jwt.decode(req.headers.authorization)
         const id=ownerToken.userId
-        cabDetails.findOne({cabId:id,deleteFlag:'false'},(err,datas)=>{
+        cabDetails.findOne({cabOwnerId:id,deleteFlag:'false'},(err,datas)=>{
             if(err)throw err
             console.log('line 87',datas)
-            cabDetails.findOneAndUpdate({cabId:id},req.body,{new:true},(err,data)=>{
+            cabDetails.findOneAndUpdate({cabOwnerId:id},req.body,{new:true},(err,data)=>{
                 if(err)throw err
                 console.log('line 90',data)
                 res.status(200).send({message:'sucessfully update cab details',data})

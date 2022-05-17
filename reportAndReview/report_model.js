@@ -2,7 +2,7 @@ const mongoose=require('mongoose')
 
 const reportSchema=mongoose.Schema({
 
-    vehicleNumber:String,
+    cabId:String,
     message:String,
     userDetails:{
         type:Object
@@ -13,7 +13,16 @@ const reportSchema=mongoose.Schema({
     }
 })
 
-const report=mongoose.model('reportDetails',reportSchema)
+const reviewSchema=mongoose.Schema({
+    cabId:String,
+    message:String,
+    userDetails:{
+        type:Object
+    }
+})
 
-module.exports={report}
+const report=mongoose.model('reportDetails',reportSchema)
+const review=mongoose.model('reviewSchema',reviewSchema)
+
+module.exports={report,review}
     
