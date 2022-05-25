@@ -1,17 +1,19 @@
 const router=require('express').Router()
-const {register,login,registerImage,forgetPassword,aggregateLogin}=require('./register_controller')
+const registerControl=require('./register_controller')
 const valid=require('./register_model')
 const validation=require('../middleware/register_validation')
 const multer=require('../middleware/multer')
 
-router.post('/register',validation.validation,register)
+router.post('/register',validation.validation,registerControl.registerForAll)
 
-router.post('/image',multer.upload.single('image'),registerImage)
+router.post('/verifyOtp',registerControl.verificationOtp)
 
-router.post('/login',valid.validation,login)
+router.post('/image',multer.upload.single('image'),registerControl.registerImage)
 
-router.post('/forgetPassword',validation.validation,forgetPassword)
+router.post('/login',valid.validation,registerControl.login)
 
-router.post('/aggregateLogin',valid.validation,aggregateLogin)
+router.post('/forgetPassword',validation.validation,registerControl.forgetPassword)
+
+router.post('/aggregateLogin',valid.validation,registerControl.aggregateLogin)
 
 module.exports=router

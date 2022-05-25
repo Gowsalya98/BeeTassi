@@ -6,27 +6,60 @@ const { register,image,sendOtp} = require('./register_model')
 const {driverDetails}=require('../driverDetails/driver_model')
 const {randomString}=require('../userDetails/random_string')
 
-exports.register=(req,res)=>{
+const registerForAll=(req,res)=>{
     try{
         console.log('line 11',req.body)
         register.countDocuments({email:req.body.email},async(err,num)=>{
             if(num==0){
                 console.log('line 10',num)
                 req.body.password = await bcrypt.hashSync(req.body.password, 10)
-                register.create(req.body,(err,data)=>{
-                    if(err){throw err}
-                    console.log('line 21',data)
-                    res.status(200).send({message:'Register successfully',data})
+                register.create(req.body,async(err,data)=>{
+                    if(data){
+                        const otp = randomString(3)
+                        console.log("otp", otp)
+                        req.body.userDetails=data
+                        const datas=await sendOtp.create({otp: otp,userDetails:req.body.userDetails})
+                        if (datas) {
+                        postMail(data.email,"verification otp",otp)
+                        const response = await fast2sms.sendMessage({ authorization: process.env.OTPKEY,message:otp,numbers:[req.body.contact]})
+                        res.status(200).send({ message: "verification otp send your mobile number,Register Successfull",data:datas})
+                        setTimeout(() => {
+                            sendOtp.findOneAndDelete({ otp: otp }, (err, result) => {
+                                if (err) { throw err }
+                                console.log("line 24", result)
+                            })
+                        }, 50000000)
+                        }else{
+                            res.status(400).send({success:'false',message:'failed'})
+                        }
+                    }else{
+                        res.status(400).send({success:'false',message:'failed'})
+                    }
                 })
             }else{
-                res.status(400).send({message:"email already exists"})
+                res.status(400).send({success:'false',message:'email already exist'})
             }
-        })
+    })
     }catch(err){
         res.status(500).send({success:'false',message:'internal server error'})
     }
 }
-exports.registerImage=(req,res)=>{
+
+const verificationOtp=async(req,res)=>{
+    try{
+       const data=await sendOtp.aggregate([{$match:{otp:req.body.otp}}])
+       console.log('line 52',data)
+       if(data.length!=0){
+           res.status(200).send({success:'true',message:'successfull',data})
+       }else{
+           res.status(400).send({success:'false',message:'invalid otp try it again',data:[]})
+       }
+    }catch(err){
+        res.status(500).send({message:err.message})
+    }
+}
+
+const registerImage=(req,res)=>{
     try{
         if(req.file ==null||undefined){
             req.body.image=""
@@ -42,7 +75,7 @@ exports.registerImage=(req,res)=>{
         res.status(500).send({success:'false',message:'internal server error'})  
     }
 }
-exports.login=(req,res)=>{
+const login=(req,res)=>{
     try {
         console.log('line 47',req.body)
         register.findOne({ email: req.body.email,deleteFlag:'false'},async (err, data) => {
@@ -87,7 +120,7 @@ exports.login=(req,res)=>{
     }
 }
 
-exports.forgetPassword=(req,res)=>{
+const forgetPassword=(req,res)=>{
     try{
         if (req.body.otp != null) {
             sendOtp.findOne({ otp: req.body.otp }, async (err, result) => {
@@ -177,7 +210,7 @@ const postMail = function (to, subject, text) {
 }
 
 
-exports.aggregateLogin=async(req,res)=>{
+const aggregateLogin=async(req,res)=>{
     console.log('line 171',req.body)
     const data=await register.aggregate([{$match:{$and:[{email:req.body.email},{deleteFlag:"false"}]}}])
     if(data){
@@ -192,4 +225,8 @@ exports.aggregateLogin=async(req,res)=>{
     }else{
         res.status(400).send({message:'data not exists'})
     }
+}
+
+module.exports={
+    registerForAll,registerImage,login,verificationOtp,forgetPassword,aggregateLogin
 }

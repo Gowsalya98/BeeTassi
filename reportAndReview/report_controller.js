@@ -88,7 +88,7 @@ const reviewForCab=(req,res)=>{
                 res.status(400).send('invalid token')
             }else{
             req.body.userDetails=datas
-                report.create(req.body,(err,data)=>{
+                review.create(req.body,(err,data)=>{
                   if(data){
                     console.log('line 18',data)
                     res.status(200).send({message:"your review",data})
