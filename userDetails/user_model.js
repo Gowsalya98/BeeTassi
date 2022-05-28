@@ -15,8 +15,18 @@ const userBookingSchema=mongoose.Schema({
     selectCab:String,
     selectDate:String,
     selectTiming:String,
-    selectSeats:Number,
-    payOption:String,
+    firstName:{
+        type:String,
+        default:''
+    },
+    lastName:{
+        type:String,
+        default:''
+    },
+    email:{
+        type:String,
+        default:''
+    },
     travelDistance:String,
     price:Number,
     rideStatus:{
@@ -26,7 +36,11 @@ const userBookingSchema=mongoose.Schema({
     userDetails:{
        type:Object 
     },
-    drop:String
+    drop:String,
+    deleteFlag:{
+        type:String,
+        default:'false'
+    }
 })
 
 

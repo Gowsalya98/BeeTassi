@@ -11,6 +11,8 @@ exports.createPayment=async(req,res)=>{
         const data=await userBooking.findOne({_id:req.params.userBookingId,deleteFlag:'false'})
         if(data){
             req.body.userDetails=data
+            req.body.createdAt=moment(new Date()).toISOString().slice(0,9)
+                console.log('line 15',req.body.createdAt)
             payment.create(req.body,(err,result)=>{
                 if(err){res.status(400).send({message:'unsuccessfull payment'})}
                 else{
@@ -39,6 +41,7 @@ exports.createPaymentId=async(req,res)=>{
     currency: "INR",
     receipt: "order_rcptid_11"
   };
+
   instance.orders.create(options, function(err, order) {
       if(err){res.status(200).send({message:'unsuccessfull'})}
       else{

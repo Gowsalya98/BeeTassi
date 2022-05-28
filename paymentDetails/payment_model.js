@@ -12,10 +12,7 @@ const paymentSchema=mongoose.Schema({
         type:String,
         default:'paid'
     },
-    createdAt:{
-        type:Date,
-        default:new Date()
-    },
+    createdAt:String,
     transactionStatus: {
         type: String,
         default: "Success"
@@ -30,6 +27,7 @@ const paymentIdSchema=mongoose.Schema({
 })
 
 const payment=mongoose.model('paymentDetails',paymentSchema)
+
 const orderData=mongoose.model('paymentIdSchema',paymentIdSchema)
 
 module.exports={payment,orderData}

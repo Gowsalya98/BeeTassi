@@ -3,7 +3,7 @@ const router=require('express').Router()
 const {addCabDetails,cabDetailImage,getAllCabList,getAllAvailableCabList,getSingleCabDetails,updateCabDetails,deleteCabDetails}=require('../vehicleDetails/vehicle_controller')
 const multer=require('../middleware/multer')
 
-router.post('/addCabDetails',addCabDetails)
+router.post('/addCabDetails/:driverId',addCabDetails)
 
 router.post('/image',multer.upload.single('image'),cabDetailImage)
 

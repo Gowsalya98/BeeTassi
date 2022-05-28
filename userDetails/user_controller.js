@@ -1,10 +1,36 @@
 const fast2sms=require('fast-two-sms')
 const jwt=require('jsonwebtoken')
+const moment=require('moment')
 const nodeGeocoder = require('node-geocoder');
 const { randomString } = require('./random_string')
 const {userBooking}=require('./user_model')
 const { register,sendOtp} = require('../register/register_model')
 const {cabDetails}=require('../vehicleDetails/vehicle_model')
+
+
+const cabBooking=(req,res)=>{
+    try{
+        console.log('line 12',req.body);
+        const userToken=jwt.decode(req.headers.authorization)
+        const id=userToken.userId
+        register.findOne({_id:id,deleteFlag:"false"},(err,data1)=>{
+                if(data1){
+                    req.body.userDetails=data1
+                    userBooking.create(req.body,(err,data2)=>{
+                        if(data2){
+                            res.status(200).send({success:'true',message:'successfull',data:data2})
+                        }else{
+                            res.status(302).send({message:'failed',data:[]})
+                        }
+                    })
+                }else{
+                    res.status(302).send({message:'invalid id',data:[]})
+                }
+            })
+    }catch(err){
+        res.status(500).send({message:'internal server error'})
+    }
+}
 
 const userBookingCab= async(req, res) => {
     try{
@@ -12,13 +38,17 @@ const userBookingCab= async(req, res) => {
         if(req.body!=null){
         const userToken=jwt.decode(req.headers.authorization)
         const id=userToken.userId
-        register.findOne({_id:id,deleteFlag:"false"},(err,data)=>{
-                if(data){
-                     const otp = randomString(3)
-                                  console.log("otp", otp)
-                                 req.body.userDetails=data
+        register.findOne({_id:id,deleteFlag:"false"},(err,data1)=>{
+                if(data1){
+                    req.body.userDetails=data1
+                    userBooking.create(req.body,(err,data2)=>{
+                        if(data2){
+                            userBooking.findOneAndUpdate({_id:data2._id,deleteFlag:'false'},req.body,{new:true},(err,data3)=>{
+                                if(data3){
+                                    const otp = randomString(3)
+                                 console.log("otp", otp)
+                                 req.body.userDetails=data3
                                   sendOtp.create({otp: otp,userDetails:req.body.userDetails},async(err, datas) => {
-                                      if(err){throw err}
                                       if (datas) {
                                         let options = { provider: 'openstreetmap'}
                                         let geoCoder = nodeGeocoder(options);
@@ -40,29 +70,33 @@ const userBookingCab= async(req, res) => {
                                           req.body.travelDistance=locationOfUser;
                                           console.log('line 41',locationOfUser)
                                           console.log('line 39',req.body.travelDistance)
-                                         var rate=35;
-                                          const count=rate*req.body.travelDistance
+                                          cabDetails.findOne({_id:req.params.cabId,deleteFlag:'false'},async(err,cab)=>{
+                                            if(cab){
+                                          const count=cab.perKMPrice*req.body.travelDistance
                                           req.body.price=count
                                           console.log('line 43',req.body.price)
-                                               req.body.createdAt=new Date().toString().substring(0,10)
-                                                cabDetails.findOne({carModel:req.body.selectCab,deleteFlag:'false'},async(err,cab)=>{
-                                                   if(cab){
-                                                    const cabdl=await cabDetails.findOneAndUpdate({carModel:req.body.selectCab},{$set:{cabStatus:'booking'}},{new:true})
-                                                    if(cabdl){
-                                                        console.log('line 53',cabdl);
-                                                        console.log('line 54',req.body);
-                                                        userBooking.create(req.body,async(err,result)=>{
-                                                            if(err)throw err
-                                                        const response = await fast2sms.sendMessage({ authorization: process.env.OTPKEY,message:otp,numbers:[req.body.contact]})
-                                                        res.status(200).send({ message: "verification otp send your mobile number",otp,result:result,cabdetails:cabdl})
-                                                        })
-                                                    }else{res.status(400).send({message:'does not update'})}
-                                                   }else{res.status(400).send({message:'invaild id'})}
-                                            })
-                                      }else{
-                                          res.status(400).send('something wrong')
-                                      }
-                                     })             
+                                          req.body.createdAt=moment(new Date()).toISOString().slice(0,9)
+                                          console.log('line 48',req.body)
+
+                                userBooking.findOneAndUpdate({_id:data2._id},req.body,async(err,result)=>{
+                                        if(err)throw err
+                            const response = await fast2sms.sendMessage({ authorization: process.env.OTPKEY,message:otp,numbers:[req.body.contact]})
+                            res.status(200).send({ message: "verification otp send your mobile number",otp,result:result})
+                            })
+                        }else{res.status(400).send({message:'invaild id'})}
+                            })
+                                   }else{
+                                       res.status(400).send('something wrong')
+                                   }
+                                })
+                                }else{
+                                    res.status(302).send({success:"false",message:'failed to update'})
+                                }
+                            })
+                        }else{
+                            res.status(302).send({success:"false",message:'failed to create'})
+                        }
+                    })                              
              }else{
                  res.status(400).send('something error please check it')
              }
@@ -242,6 +276,6 @@ const deleteUserProfile=(req,res)=>{
 
 
 module.exports={
-    userBookingCab,getAllUserBookingDetails,getSingleUserBookingDetails,userSearch,createUserprofileAccountDetails,
+    cabBooking,userBookingCab,getAllUserBookingDetails,getSingleUserBookingDetails,userSearch,createUserprofileAccountDetails,
     getAllUserList,getSingleUserDetails,updateUserProfile,deleteUserProfile
 }

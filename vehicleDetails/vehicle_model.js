@@ -18,25 +18,26 @@ const cabDetailsSchema=mongoose.Schema({
     //         default:"false"
     //     }
     // }],
-    createdAt:{
-        type:Date,
-        default:new Date()
-    },
+    createdAt:String,
     carModel:String,
     carBrand:String,
     carImage:String,
     numberOfSeats:Number,
     carRegNumber:String,
-    //perDayPrice:Number,
+    perKMPrice:Number,
     rcBookNumber:String,
     frontRcBookImage:String,
     backRcBookImage:String,
     cabOwnerId:String,
+    driverId:String,
     rating:{
         type:Number,
         default:0
     },
     cabOwner:{
+        type:Object
+    },
+    cabDriver:{
         type:Object
     },
     cabStatus:{

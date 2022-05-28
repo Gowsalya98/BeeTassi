@@ -1,6 +1,8 @@
 
 const {cabDetails,cabImage}=require('./vehicle_model')
 const {register}=require('../register/register_model')
+const {driverDetails}=require('../driverDetails/driver_model')
+const moment=require('moment')
 const jwt=require('jsonwebtoken')
 
 exports.addCabDetails=((req,res)=>{
@@ -10,9 +12,15 @@ exports.addCabDetails=((req,res)=>{
         const id=ownerToken.userId
        console.log('line 12',id)
         req.body.cabOwnerId=id
+        driverDetails.findOne({_id:req.params.driverId,deleteFlag:'false'},(err,datas)=>{
+            if(datas){
+                req.body.cabDriver=datas
+                req.body.driverId=datas._id
                 register.findOne({_id:id,deleteFlag:'false'},(err,result)=>{
                     if(result){
                     req.body.cabOwner=result
+                    req.body.createdAt=moment(new Date()).toISOString().slice(0,9)
+                console.log('line 17',req.body.createdAt)
                 cabDetails.create(req.body,(err,data)=>{
                     if(err){throw err}
                     else{
@@ -22,6 +30,11 @@ exports.addCabDetails=((req,res)=>{
                 })
             }else{res.status(400).send({message:'invalid Token'})}
                 })
+            }else{
+                res.status(400).send({message:'invalid id'}) 
+            }
+        })
+                
                 
     }catch(err){
         res.status(500).send({message:err.message})

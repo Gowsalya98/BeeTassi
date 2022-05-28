@@ -1,6 +1,7 @@
 const {driverDetails}=require('./driver_model')
 const {sendOtp}=require('../register/register_model')
 const nodemailer=require('nodemailer')
+const moment=require('moment')
 const jwt=require('jsonwebtoken')
 const bcrypt=require('bcrypt')
 const { userBooking } = require('../userDetails/user_model')
@@ -18,6 +19,8 @@ exports.addDriver=(req,res)=>{
                     req.body.driverId=id
                     const driverPassword=req.body.password
                 req.body.password = await bcrypt.hash(req.body.password, 10)
+                req.body.createdAt=moment(new Date()).toISOString().slice(0,9)
+                console.log('line 22',req.body.createdAt)
                 driverDetails.create(req.body,(err,data)=>{
                     if(err){throw err}
                      else{

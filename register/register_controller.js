@@ -2,6 +2,7 @@ const bcrypt=require('bcrypt')
 const jwt=require('jsonwebtoken')
 const nodemailer=require('nodemailer')
 const fast2sms=require('fast-two-sms')
+const moment=require('moment')
 const { register,image,sendOtp} = require('./register_model')
 const {driverDetails}=require('../driverDetails/driver_model')
 const {randomString}=require('../userDetails/random_string')
@@ -13,6 +14,8 @@ const registerForAll=(req,res)=>{
             if(num==0){
                 console.log('line 10',num)
                 req.body.password = await bcrypt.hashSync(req.body.password, 10)
+                req.body.createdAt=moment(new Date()).toISOString().slice(0,9)
+                console.log('line 17',req.body.createdAt)
                 register.create(req.body,async(err,data)=>{
                     if(data){
                         const otp = randomString(3)

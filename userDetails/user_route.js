@@ -4,7 +4,9 @@ const bookingControl=require('./user_controller')
 
 const validationResult=require('../middleware/register_validation')
 
-router.post('/userBookToCab',validationResult.validation,bookingControl.userBookingCab)
+router.post('/cabBooking',bookingControl.cabBooking)
+
+router.post('/userBookToCab/:cabId',validationResult.validation,bookingControl.userBookingCab)
 
 router.get('/getAllUserBookingDetails',bookingControl.getAllUserBookingDetails)
 

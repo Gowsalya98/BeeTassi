@@ -1,10 +1,7 @@
 const mongoose=require('mongoose')
 
 const driverSchema=mongoose.Schema({
-    createdAt:{
-        type:Date,
-        default:Date.now()
-    },
+    createdAt:String,
     driverName:String,
     email:String,
     password:String,
@@ -15,6 +12,7 @@ const driverSchema=mongoose.Schema({
     backImageLicense:String,
     carRegNumber:String,
     driverId:String,
+    cabId:String,
     driverLocation:{
         driverLatitude:{
             type:Number,
@@ -24,6 +22,9 @@ const driverSchema=mongoose.Schema({
             type:Number,
             default:0
         }
+    },
+    cabDetails:{
+        type:Object
     },
     deleteFlag:{
         type:String,
