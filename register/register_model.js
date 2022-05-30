@@ -2,6 +2,7 @@ const mongoose=require('mongoose')
 const {check}=require('express-validator')
 
 const registerSchema=mongoose.Schema({
+    otp:Number,
     name:String,
     email:String,
     password:String,

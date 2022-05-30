@@ -15,9 +15,11 @@ const cabBooking=(req,res)=>{
         const id=userToken.userId
         register.findOne({_id:id,deleteFlag:"false"},(err,data1)=>{
                 if(data1){
+                    console.log('line 18',data1)
                     req.body.userDetails=data1
                     userBooking.create(req.body,(err,data2)=>{
                         if(data2){
+                            console.log('line 21',data2)
                             res.status(200).send({success:'true',message:'successfull',data:data2})
                         }else{
                             res.status(302).send({message:'failed',data:[]})
@@ -28,28 +30,24 @@ const cabBooking=(req,res)=>{
                 }
             })
     }catch(err){
+        console.log(err)
         res.status(500).send({message:'internal server error'})
     }
 }
 
 const userBookingCab= async(req, res) => {
     try{
-        console.log('line 12',req.body);
+        console.log('line 40',req.body);
         if(req.body!=null){
         const userToken=jwt.decode(req.headers.authorization)
         const id=userToken.userId
         register.findOne({_id:id,deleteFlag:"false"},(err,data1)=>{
                 if(data1){
-                    req.body.userDetails=data1
-                    userBooking.create(req.body,(err,data2)=>{
-                        if(data2){
-                            userBooking.findOneAndUpdate({_id:data2._id,deleteFlag:'false'},req.body,{new:true},(err,data3)=>{
-                                if(data3){
                                     const otp = randomString(3)
                                  console.log("otp", otp)
-                                 req.body.userDetails=data3
-                                  sendOtp.create({otp: otp,userDetails:req.body.userDetails},async(err, datas) => {
-                                      if (datas) {
+                                 req.body.userDetails=data1
+                        sendOtp.create({otp: otp,userDetails:req.body.userDetails},async(err, datas) => {
+                        if (datas) {
                                         let options = { provider: 'openstreetmap'}
                                         let geoCoder = nodeGeocoder(options);
                                         const convertAddressToLatLon=await(geoCoder.geocode(req.body.drop))
@@ -70,39 +68,36 @@ const userBookingCab= async(req, res) => {
                                           req.body.travelDistance=locationOfUser;
                                           console.log('line 41',locationOfUser)
                                           console.log('line 39',req.body.travelDistance)
-                                          cabDetails.findOne({_id:req.params.cabId,deleteFlag:'false'},async(err,cab)=>{
-                                            if(cab){
+                            cabDetails.findOne({_id:req.params.cabId,deleteFlag:'false'},async(err,cab)=>{
+                            if(cab){
                                           const count=cab.perKMPrice*req.body.travelDistance
                                           req.body.price=count
                                           console.log('line 43',req.body.price)
                                           req.body.createdAt=moment(new Date()).toISOString().slice(0,9)
                                           console.log('line 48',req.body)
 
-                                userBooking.findOneAndUpdate({_id:data2._id},req.body,async(err,result)=>{
-                                        if(err)throw err
+                                userBooking.findOneAndUpdate({_id:req.params.userId},req.body,{new:true},async(err,result)=>{
+                                        if(result){
                             const response = await fast2sms.sendMessage({ authorization: process.env.OTPKEY,message:otp,numbers:[req.body.contact]})
                             res.status(200).send({ message: "verification otp send your mobile number",otp,result:result})
-                            })
-                        }else{res.status(400).send({message:'invaild id'})}
-                            })
-                                   }else{
-                                       res.status(400).send('something wrong')
-                                   }
-                                })
-                                }else{
-                                    res.status(302).send({success:"false",message:'failed to update'})
-                                }
+                                        }else{
+                                            res.status(302).send({success:'false',message:'data not found'})
+                                        }
                             })
                         }else{
-                            res.status(302).send({success:"false",message:'failed to create'})
+                            res.status(302).send({success:"false",message:'failed',data:[]})
                         }
-                    })                              
+                    }) 
+                }else{
+                    res.status(302).send({success:'false',message:"does not create"})
+                }  
+            })                           
              }else{
-                 res.status(400).send('something error please check it')
+                 res.status(400).send('please provide valid token')
              }
             
         })
-    }else{res.status(400).send('please provide valid details')}
+    }else{res.status(400).send('something error please check it')}
    
 }catch(err){
     res.status(500).send({message:err.message})

@@ -50,8 +50,9 @@ const registerForAll=(req,res)=>{
 
 const verificationOtp=async(req,res)=>{
     try{
-       const data=await sendOtp.aggregate([{$match:{otp:req.body.otp}}])
-       console.log('line 52',data)
+        console.log('line 53',req.body)
+       const data=await sendOtp.aggregate([{$match:{$and:[{otp:req.body.otp},{deleteFlag:"false"}]}}])
+       console.log('line 55',data)
        if(data.length!=0){
            res.status(200).send({success:'true',message:'successfull',data})
        }else{
@@ -88,6 +89,7 @@ const login=(req,res)=>{
                         const verifyPassword = await bcrypt.compare(req.body.password,data.password)
                         if (verifyPassword === true) {
                             const token = await jwt.sign({ userId: data._id }, process.env.SECRET_KEY)
+                            console.log('line 92',data,token)
                             res.status(200).send({ message: 'login successfull',token,data })
                         } else {res.status(400).send({ message: 'password does not match' })}
                     }else{res.status(400).send({message:"something wrong"})}

@@ -4,31 +4,49 @@ const mongoose=require('mongoose')
 const userBookingSchema=mongoose.Schema({
     createdAt:String,
     pickUpLocation:{
-        pickUpLatitude:Number,
-        pickUpLongitude:Number
-    },
+        pickUpLatitude:{
+            type:Number,
+            default:0
+        },
+        pickUpLongitude:{
+            type:Number,
+            default:0
+    }
+},
     dropLocation:{
-        dropLatitude:Number,
-        dropLongitude:Number
-    },
+        dropLatitude:{
+            type:Number,
+            default:0
+        },
+        dropLongitude:{
+            type:Number,
+            default:0
+    }
+},
     contact:Number,
-    selectCab:String,
-    selectDate:String,
-    selectTiming:String,
-    firstName:{
+    selectCab:{
         type:String,
         default:''
     },
-    lastName:{
+    selectDate:{
         type:String,
         default:''
     },
-    email:{
+    selectTiming:{
         type:String,
         default:''
     },
-    travelDistance:String,
-    price:Number,
+    firstName:String,
+    lastName:String,
+    email:String,
+    travelDistance:{
+        type:String,
+        default:''
+    },
+    price:{
+        type:Number,
+        default:0
+    },
     rideStatus:{
         type:String,
         default:'pending'
