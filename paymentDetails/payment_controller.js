@@ -1,16 +1,16 @@
 const {payment,orderData}=require('./payment_model')
 const {userBooking}=require('../userDetails/user_model')
 const {makeId}=require('../userDetails/random_string')
-const razorpay=require('razorpay')
-const res = require('express/lib/response')
 const { register } = require('../register/register_model')
+const razorpay=require('razorpay')
+const moment=require('moment')
 
 exports.createPayment=async(req,res)=>{
     try{
         console.log('line 9',req.body)
         const data=await userBooking.findOne({_id:req.params.userBookingId,deleteFlag:'false'})
         if(data){
-            req.body.userDetails=data
+            req.body.user=data
             req.body.createdAt=moment(new Date()).toISOString().slice(0,9)
                 console.log('line 15',req.body.createdAt)
             payment.create(req.body,(err,result)=>{
@@ -92,6 +92,7 @@ exports.superAdminPackageDetails=async(req,res)=>{
     try{
       const data=await payment.findOne({paymentId:req.params.paymentId})
             if(data){
+                console.log('line 94',data)
                 const datas=await userBooking.findOne({_id:req.params.userBookingId,rideStatus:'rideFinish'})
                 if(datas){
                 console.log('line 94',datas)
@@ -100,10 +101,10 @@ exports.superAdminPackageDetails=async(req,res)=>{
                 console.log('line 97',result)
                 res.status(200).send({message:'package send successfull',result})
             }else{
-                res.status(400).send({message:'invalid payment id'})  
+                res.status(400).send({message:'invalid user booking id'})  
             }
        }else{
-          res.status(400).send({message:'invalid booking id'}) 
+          res.status(400).send({message:'invalid order id'}) 
        }
         
     }catch(err){

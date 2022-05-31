@@ -17,7 +17,7 @@ const paymentSchema=mongoose.Schema({
         type: String,
         default: "Success"
     },
-    userDetails:{
+    user:{
         type:Object
     }
 })
