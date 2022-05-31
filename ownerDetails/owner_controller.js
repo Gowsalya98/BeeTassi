@@ -1,4 +1,4 @@
-
+const {userBooking}=require('../userDetails/user_model')
 const {register}=require('../register/register_model')
 const {driverDetails}=require('../driverDetails/driver_model')
 const{cabDetails}=require('../vehicleDetails/vehicle_model')
@@ -90,7 +90,28 @@ const ownerGetOurOwnVehicleList=(req,res)=>{
         res.status(500).send({message:err.message})
     }
 }
-
+const ownergetOurOwnCabBookingHistory=async(req,res)=>{
+    try{
+        try{
+            const ownerToken=jwt.decode(req.headers.authorization)
+            const id=ownerToken.userId
+            if(id!=null){
+                const data=await userBooking.aggregate([{$match:{$and:[{"cabDetails.cabOwnerId":(id)},{deleteFlag:'false'}]}}])
+                if(data.length!=0){
+                   res.status(200).send({success:'true',message:' booking history',data:data})
+                }else{
+                   res.status(302).send({success:'false',message:'data not found',data:[]})
+                }
+            }else{
+               res.status(400).send({success:'false',message:'invalid token'})
+            }
+        }catch(err){
+            res.status(500).send({message:'internal server error'})
+        }
+    }catch(err){
+        res.status(500).send({message:'internal server error'})
+    }
+}
 const getAllOwnerList=(req,res)=>{
     try{
         register.find({typeOfRole:'owner',deleteFlag:'false'}, (err, data) => {
@@ -179,6 +200,7 @@ module.exports={
     search,ownerGetOurOwnEmployeeList,
     ownerGetOurOwnVehicleList,
     createOwnerProfileDetails,
+    ownergetOurOwnCabBookingHistory,
     getAllOwnerList,
     getSingleOwnerDetails,
     updateOwnerProfile,

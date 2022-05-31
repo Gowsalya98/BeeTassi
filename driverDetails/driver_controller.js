@@ -1,5 +1,5 @@
 const {driverDetails}=require('./driver_model')
-const {sendOtp}=require('../register/register_model')
+const {sendOtp,register}=require('../register/register_model')
 const nodemailer=require('nodemailer')
 const moment=require('moment')
 const jwt=require('jsonwebtoken')
@@ -15,20 +15,26 @@ exports.addDriver=(req,res)=>{
                 const ownerToken=jwt.decode(req.headers.authorization)
                 if(ownerToken!=undefined){
                 const id = ownerToken.userId
-                console.log('line 16',id)
-                    req.body.driverId=id
-                    const driverPassword=req.body.password
-                req.body.password = await bcrypt.hash(req.body.password, 10)
-                req.body.createdAt=moment(new Date()).toISOString().slice(0,9)
-                console.log('line 22',req.body.createdAt)
-                driverDetails.create(req.body,(err,data)=>{
-                    if(err){throw err}
-                     else{
-                        postMail( data.email, 'BeeTassi=>your job confirm your login details below here',"email:"+req.body.email+','+"password:"+driverPassword+','+"CabRegisterNumber:"+req.body.carRegNumber)
-                        console.log('line 19',data)
-                        res.status(200).send({message:"Register successfully,mail send successfully",data})
-                    }
-                })
+                    register.findOne({_id:id,deleteFlag:'false'},async(err,datas)=>{
+                        if(datas){
+                    //  req.body.ownerDetails=datas
+                        req.body.ownerId=id
+                        const driverPassword=req.body.password
+                    req.body.password = await bcrypt.hash(req.body.password, 10)
+                    req.body.createdAt=moment(new Date()).toISOString().slice(0,9)
+                    console.log('line 22',req.body.createdAt)
+                    driverDetails.create(req.body,(err,data)=>{
+                        if(err){throw err}
+                         else{
+                            postMail( data.email, 'BeeTassi=>your job confirm your login details below here',"email:"+req.body.email+','+"password:"+driverPassword+','+"CabRegisterNumber:"+req.body.carRegNumber)
+                            console.log('line 19',data)
+                            res.status(200).send({message:"Register successfully,mail send successfully",data})
+                        }
+                    })
+                }else{
+                    res.status(200).send({message:"data not found"})
+                }
+                    })
                 }else{
                     res.status(400).send({message:'please provide owner token'})
             } 
@@ -119,7 +125,58 @@ exports.getAllDriverList=(req,res)=>{
         res.status(500).send({message:err.message})
     }
 }
-
+exports.driverAcceptUserRide=async(req,res)=>{
+    try{
+        const driverToken=jwt.decode(req.headers.authorization)
+        if(driverToken!=null){
+      const data=await userBooking.findOne({_id:req.params.bookingId,deleteFlag:false})
+      console.log('line 131',data)
+      if(data){
+          console.log('line 133',data.userDetails.email)
+          postMail(data.userDetails.email,"Booking Confirmation","congratulations...!,your booking is accepted")
+          const datas=await userBooking.findOneAndUpdate({_id:req.params.bookingId},{$set:{rideStatus:"acceptRide","cabDetails.cabStatus":"booked"}},{new:true})
+          if(datas){
+              console.log('line 137',datas)
+              res.status(200).send({message:"driver accept your ride send email successfully",datas})
+          }else{
+              res.status(400).send({message:"failed",data:[]})
+          }
+      }else{
+          res.status(302).send({message:'invalid id'})
+      }
+    }else{
+        res.status(302).send({message:'invalid driver token'})
+    }
+    }catch(err){
+      res.status(500).send({message:'internal server error'})
+    }
+  }
+  exports.driverRejectUserRide=async(req,res)=>{
+    try{
+        const driverToken=jwt.decode(req.headers.authorization)
+        if(driverToken!=null){
+      const data=await userBooking.findOne({_id:req.params.bookingId,deleteFlag:false})
+      console.log('line 152',data)
+      if(data){
+          console.log('line 154',data.userDetails.email)
+          postMail(data.userDetails.email,"your booking cancel","oops...!,your booking is rejected")
+          const datas=await userBooking.findOneAndUpdate({_id:req.params.bookingId},{$set:{rideStatus:"rejectRide","cabDetails.cabStatus":"available"}},{new:true})
+          if(datas){
+              console.log('line 158',datas)
+              res.status(200).send({message:"driver reject your ride send email successfully",datas})
+          }else{
+              res.status(400).send({message:"failed",data:[]})
+          }
+      }else{
+          res.status(302).send({message:'invalid id'})
+      }
+    }else{
+        res.status(302).send({message:'invalid driver token'})
+    }
+    }catch(err){
+      res.status(500).send({message:'internal server error'})
+    }
+  }
 exports.getSingleDriverData=(req,res)=>{
     try{
     if(req.headers.authorization){

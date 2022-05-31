@@ -1,29 +1,34 @@
 const router=require('express').Router()
 
-const {addDriver,verifyUserOtp,driverUpdateRideStatus,getAllDriverList,getSingleDriverData,
-    updateDriverProfile,deleteDriverProfile}=require('../driverDetails/driver_controller')
+const driverControl=require('../driverDetails/driver_controller')
     
 const{location}=require('./location_controller')
 
 const valid=require('../register/register_model')
 
-router.post('/addDriver',valid.validation,addDriver)
+router.post('/addDriver',valid.validation,driverControl.addDriver)
+
+router.get('/getAllDriverList',driverControl.getAllDriverList)
+
+router.get('/getSingleDriverData/:id',driverControl.getSingleDriverData)
+
+router.put('/updateDriverProfile',driverControl.updateDriverProfile)
+
+router.delete('/deleteDriverProfile/:id',driverControl.deleteDriverProfile)
 
 //router.post('/login',valid.validation,login)
-router.post('/verifyUserOtp',verifyUserOtp)
+router.post('/verifyUserOtp',driverControl.verifyUserOtp)
 
 //driver update ride finish or not
-router.get('/driverUpdateRideStatus/:userBookingId',driverUpdateRideStatus)
+router.get('/driverUpdateRideStatus/:userBookingId',driverControl.driverUpdateRideStatus)
 
+//driver accept and reject user ride
+router.get('/acceptUserRide/:bookingId',driverControl.driverAcceptUserRide)
+
+router.get('/rejectUserRide/:bookingId',driverControl.driverRejectUserRide)
+
+//filter location
 router.get('/filterLocation/:latitude/:longitude',location)
-
-router.get('/getAllDriverList',getAllDriverList)
-
-router.get('/getSingleDriverData/:id',getSingleDriverData)
-
-router.put('/updateDriverProfile',updateDriverProfile)
-
-router.delete('/deleteDriverProfile/:id',deleteDriverProfile)
 
 
 module.exports=router

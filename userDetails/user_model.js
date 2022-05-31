@@ -24,35 +24,24 @@ const userBookingSchema=mongoose.Schema({
     }
 },
     contact:Number,
-    selectCab:{
-        type:String,
-        default:''
-    },
-    selectDate:{
-        type:String,
-        default:''
-    },
-    selectTiming:{
-        type:String,
-        default:''
-    },
+    selectDate:String,
+    selectTiming:String,
     firstName:String,
     lastName:String,
     email:String,
-    travelDistance:{
-        type:String,
-        default:''
-    },
-    price:{
-        type:Number,
-        default:0
-    },
+    travelDistance:String,
+    price:Number,
     rideStatus:{
         type:String,
         default:'pending'
     },
+    userId:String,
+    cabId:String,
     userDetails:{
        type:Object 
+    },
+    cabDetails:{
+        type:Object 
     },
     drop:String,
     deleteFlag:{

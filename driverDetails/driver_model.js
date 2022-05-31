@@ -11,8 +11,7 @@ const driverSchema=mongoose.Schema({
     frontImageLicense:String,
     backImageLicense:String,
     carRegNumber:String,
-    driverId:String,
-    cabId:String,
+    ownerId:String,
     driverLocation:{
         driverLatitude:{
             type:Number,
@@ -23,9 +22,9 @@ const driverSchema=mongoose.Schema({
             default:0
         }
     },
-    cabDetails:{
-        type:Object
-    },
+    // ownerDetails:{
+    //     type:Object
+    // },
     deleteFlag:{
         type:String,
         default:false
