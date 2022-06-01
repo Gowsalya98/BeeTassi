@@ -80,7 +80,7 @@ const userBookingCab= async(req, res) => {
                                           const count=cab.perKMPrice*req.body.travelDistance
                                           req.body.price=count
                                           console.log('line 43',req.body.price)
-                                          req.body.createdAt=moment(new Date()).toISOString().slice(0,9)
+                                          req.body.createdAt=moment(new Date()).toISOString().slice(0,10)
                                           console.log('line 48',req.body)
                                 userBooking.create(req.body,async(err,result)=>{
                                         if(result){
@@ -147,6 +147,31 @@ const userGetOurOwnBookingHistory=async(req,res)=>{
          }
      }catch(err){
          res.status(500).send({message:'internal server error'})
+     }
+ }
+ const userGetOurPreviousBookingHistory=async(req,res)=>{
+     try{
+     userBooking.find({},(err,data)=>{
+        if(data){
+            console.log('line 156',data)
+            const currantDate=moment(new Date()).toISOString().slice(0,10)
+            var arr=[]
+            for(i=0;i<data.length;i++){
+               if(data[i].createdAt<currantDate){
+                   console.log('line 160',data)
+                    arr.push(data[i])
+               }else {
+                   res.status(302).send({message:'user does not travel in any place..!'})
+                }
+               }
+            console.log('.....',arr)
+            res.status(200).send({success:'true',message:'previous ride details',data})
+        }else{
+            res.status(302).send({success:'false',message:'failed'})
+        }
+     })
+     }catch(err){
+        res.status(500).send({message:'internal server error'})
      }
  }
 const getAllUserBookingDetails=async(req,res)=>{
@@ -306,7 +331,16 @@ const deleteUserProfile=(req,res)=>{
 
 
 module.exports={
-    cabBooking,userBookingCab,getAllUserBookingDetails,getSingleUserBookingDetails,
-    userSearch,createUserprofileAccountDetails,getAllUserList,getSingleUserDetails,
-    updateUserProfile,deleteUserProfile,userGetOurOwnBookingHistory,getAllPendingBookingDetails
+    cabBooking,
+    userBookingCab,
+    getAllUserBookingDetails,
+    getSingleUserBookingDetails,
+    userSearch,
+    createUserprofileAccountDetails,
+    getAllUserList,
+    getSingleUserDetails,
+    userGetOurPreviousBookingHistory,
+    updateUserProfile,deleteUserProfile,
+    userGetOurOwnBookingHistory,
+    getAllPendingBookingDetails
 }

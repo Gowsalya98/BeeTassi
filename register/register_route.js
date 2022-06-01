@@ -14,6 +14,8 @@ router.post('/login',valid.validation,registerControl.login)
 
 router.post('/forgetPassword',validation.validation,registerControl.forgetPassword)
 
-router.post('/aggregateLogin',valid.validation,registerControl.aggregateLogin)
+router.get('/total-user',registerControl.TotalUser)
+
+router.get('/total-owner',registerControl.TotalOwner)
 
 module.exports=router

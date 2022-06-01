@@ -10,6 +10,8 @@ router.post('/userBookToCab/:cabId',validationResult.validation,bookingControl.u
 
 router.get('/userGetOurOwnBookingHistory',bookingControl.userGetOurOwnBookingHistory)
 
+router.get('/user-previousBookingHistory',bookingControl.userGetOurPreviousBookingHistory)
+
 router.get('/getAllPendingBookingDetails',bookingControl.getAllPendingBookingDetails)
 
 router.get('/getAllUserBookingDetails',bookingControl.getAllUserBookingDetails)

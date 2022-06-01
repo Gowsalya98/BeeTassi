@@ -21,7 +21,7 @@ exports.addDriver=(req,res)=>{
                         req.body.ownerId=id
                         const driverPassword=req.body.password
                     req.body.password = await bcrypt.hash(req.body.password, 10)
-                    req.body.createdAt=moment(new Date()).toISOString().slice(0,9)
+                    req.body.createdAt=moment(new Date()).toISOString().slice(0,10)
                     console.log('line 22',req.body.createdAt)
                     driverDetails.create(req.body,(err,data)=>{
                         if(err){throw err}
@@ -108,7 +108,6 @@ exports.driverUpdateRideStatus=(req,res)=>{
         res.status(500).send({message:err.message})
     }
 }
-
 exports.getAllDriverList=(req,res)=>{
     try{
         driverDetails.find({typeOfRole:"driver",deleteFlag:"false"},(err,data)=>{

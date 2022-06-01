@@ -34,6 +34,10 @@ const cabDetailsSchema=mongoose.Schema({
         type:Number,
         default:0
     },
+    review:{
+        type:String,
+        default:''
+    },
     cabOwner:{
         type:Object
     },

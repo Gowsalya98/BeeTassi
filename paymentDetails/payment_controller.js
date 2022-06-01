@@ -3,6 +3,7 @@ const {userBooking}=require('../userDetails/user_model')
 const {makeId}=require('../userDetails/random_string')
 const { register } = require('../register/register_model')
 const razorpay=require('razorpay')
+const jwt=require('jsonwebtoken')
 const moment=require('moment')
 
 exports.createPayment=async(req,res)=>{
@@ -11,7 +12,7 @@ exports.createPayment=async(req,res)=>{
         const data=await userBooking.findOne({_id:req.params.userBookingId,deleteFlag:'false'})
         if(data){
             req.body.user=data
-            req.body.createdAt=moment(new Date()).toISOString().slice(0,9)
+            req.body.createdAt=moment(new Date()).toISOString().slice(0,10)
                 console.log('line 15',req.body.createdAt)
             payment.create(req.body,(err,result)=>{
                 if(err){res.status(400).send({message:'unsuccessfull payment'})}
@@ -109,5 +110,47 @@ exports.superAdminPackageDetails=async(req,res)=>{
         
     }catch(err){
          res.status(200).send({message:err.message})
+    }
+}
+
+exports.userGetOurOwnPaymentDetails=async(req,res)=>{
+    try{
+        const userToken=jwt.decode(req.headers.authorization)
+         const id=userToken.userId
+         console.log('id',id)
+         if(id!=null){
+             const data=await payment.aggregate([{$match:{"user.userId":id}}])
+                console.log('line 122',data)
+             if(data.length!=0){
+                res.status(200).send({success:'true',message:'your payment history',data:data})
+             }else{
+                res.status(302).send({success:'false',message:'data not found',data:[]})
+             }
+         }else{
+            res.status(400).send({success:'false',message:'invalid token'})
+         }
+     }catch(err){
+         console.log(err)
+         res.status(500).send({message:'internal server error'})
+     }
+}
+
+exports.ownerGetOurOwnPaymentDetails=async(req,res)=>{
+    try{
+        const ownerToken=jwt.decode(req.headers.authorization)
+         const id=ownerToken.userId
+         if(id!=null){
+             const data=await payment.aggregate([{$match:{"user.cabDetails.cabOwnerId":id}}])
+             console.log('line 144',data)
+             if(data.length!=0){
+                res.status(200).send({success:'true',message:'owner view payment history',data:data})
+             }else{
+                res.status(302).send({success:'false',message:'data not found',data:[]})
+             }
+         }else{
+            res.status(400).send({success:'false',message:'invalid token'})
+         }
+    }catch(err){
+        res.status(500).send({message:'internal server error'})
     }
 }

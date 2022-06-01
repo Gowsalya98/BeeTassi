@@ -1,5 +1,6 @@
 const {superadmin,sendOtp} = require('./superAdmin_model')
 const {randomString}=require('../userDetails/random_string')
+const {register}=require('../register/register_model')
 const nodemailer=require('nodemailer')
 const fast2sms=require('fast-two-sms')
 const bcrypt = require('bcrypt')
@@ -149,4 +150,57 @@ const postMail = function ( to, subject, text) {
         subject: subject,
         text: text,
     })
+}
+
+exports.adminAcceptOwnerDetails=async(req,res)=>{
+    try{
+        const superAdminToken=jwt.decode(req.headers.authorization)
+        if(superAdminToken!=null){
+      const data=await register.findOne({_id:req.params.ownerId,deleteFlag:false})
+      console.log('line 160',data)
+      if(data){
+          console.log('line 162',data.email)
+          postMail(data.email,"beeTassi","congratulations...!,you are Accepted")
+          const datas=await register.findOneAndUpdate({_id:req.params.ownerId},{ownerStatus:'active'},{new:true})
+          if(datas){
+              console.log('line 166',datas)
+              res.status(200).send({message:"you are successfully add for owner",datas})
+          }else{
+              res.status(400).send({message:"failed",data:[]})
+          }
+      }else{
+          res.status(302).send({message:'invalid id'})
+      }
+    }else{
+        res.status(302).send({message:'invalid super admin token'})
+    }
+    }catch(err){
+        res.status(500).send({success:'false',message:'internal server error'})
+    }
+}
+exports.adminRejectOwnerDetails=async(req,res)=>{
+    try{
+        const superAdminToken=jwt.decode(req.headers.authorization)
+        if(superAdminToken!=null){
+      const data=await register.findOne({_id:req.params.ownerId,deleteFlag:false})
+      console.log('line 186',data)
+      if(data){
+          console.log('line 188',data.email)
+          postMail(data.email,"beeTassi","oops...!,you are Rejected")
+          const datas=await register.findOneAndUpdate({_id:req.params.ownerId},{ownerStatus:'inActive'},{new:true})
+          if(datas){
+              console.log('line 192',datas)
+              res.status(200).send({message:"you are not owner for my site",datas})
+          }else{
+              res.status(400).send({message:"failed",data:[]})
+          }
+      }else{
+          res.status(302).send({message:'invalid id'})
+      }
+    }else{
+        res.status(302).send({message:'invalid super admin token'})
+    }
+    }catch(err){
+        res.status(500).send({success:'false',message:'internal server error'})
+    }
 }

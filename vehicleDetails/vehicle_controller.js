@@ -19,7 +19,7 @@ exports.addCabDetails=((req,res)=>{
                 register.findOne({_id:id,deleteFlag:'false'},(err,result)=>{
                     if(result){
                     req.body.cabOwner=result
-                    req.body.createdAt=moment(new Date()).toISOString().slice(0,9)
+                    req.body.createdAt=moment(new Date()).toISOString().slice(0,10)
                 console.log('line 17',req.body.createdAt)
                 cabDetails.create(req.body,(err,data)=>{
                     if(err){throw err}

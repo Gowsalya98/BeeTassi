@@ -14,7 +14,7 @@ const registerForAll=(req,res)=>{
             if(num==0){
                 console.log('line 10',num)
                 req.body.password = await bcrypt.hashSync(req.body.password, 10)
-                req.body.createdAt=moment(new Date()).toISOString().slice(0,9)
+                req.body.createdAt=moment(new Date()).toISOString().slice(0,10)
                 console.log('line 17',req.body.createdAt)
                 register.create(req.body,async(err,data)=>{
                     if(data){
@@ -124,7 +124,47 @@ const login=(req,res)=>{
         res.status(500).send({success:'false',message:'internal server error'})
     }
 }
+const TotalUser=async(req,res)=>{
+    try{
+        const data=await register.aggregate([{$match:{$and:[{typeOfRole:'user'},{deleteFlag:"false"}]}}])
+        if(data){
+            const count=data.length
+            if(count!=0){
+                res.status(200).send({success:'true',message:'TotalUser',count})
+            } else{
+                res.status(302).send({success:'false',message:'data not found',data:[]})
+            }
+        }else{
+            res.status(302).send({success:'false',message:'failed'})
+        }
+    }catch(err){
+        res.status(500).send({message:err.message})
+    }
+}
+const TotalOwner=async(req,res)=>{
+    try{
+        const data=await register.aggregate([{$match:{$and:[{typeOfRole:'owner'},{deleteFlag:"false"}]}}])
+        if(data){
+            const count=data.length
+            if(count!=0){
+                res.status(200).send({success:'true',message:'TotalOwner',count})
+            } else{
+                res.status(302).send({success:'false',message:'data not found',data:[]})
+            }
+        }else{
+            res.status(302).send({success:'false',message:'failed'})
+        }
+    }catch(err){
+        res.status(500).send({message:err.message})
+    }
+}
+const TodayUser=async(req,res)=>{
+    try{
 
+    }catch(err){
+
+    }
+}
 const forgetPassword=(req,res)=>{
     try{
         if (req.body.otp != null) {
@@ -214,24 +254,11 @@ const postMail = function (to, subject, text) {
     })
 }
 
-
-const aggregateLogin=async(req,res)=>{
-    console.log('line 171',req.body)
-    const data=await register.aggregate([{$match:{$and:[{email:req.body.email},{deleteFlag:"false"}]}}])
-    if(data){
-        console.log('line 174',data)
-        const password=await bcrypt.compare(req.body.password,data[0].password)
-        console.log('line 176',data)
-        if(password==true){
-            res.status(200).send({message:'login successfull',data})
-        }else{
-        res.status(400).send({message:'invalid password'})
-        }
-    }else{
-        res.status(400).send({message:'data not exists'})
-    }
-}
-
 module.exports={
-    registerForAll,registerImage,login,verificationOtp,forgetPassword,aggregateLogin
+    registerForAll,
+    registerImage,
+    login,
+    verificationOtp,
+    forgetPassword,
+    TotalUser,TotalOwner,TodayUser
 }
