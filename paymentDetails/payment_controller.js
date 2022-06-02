@@ -6,7 +6,7 @@ const razorpay=require('razorpay')
 const jwt=require('jsonwebtoken')
 const moment=require('moment')
 
-exports.createPayment=async(req,res)=>{
+const createPayment=async(req,res)=>{
     try{
         console.log('line 9',req.body)
         const data=await userBooking.findOne({_id:req.params.userBookingId,deleteFlag:'false'})
@@ -30,7 +30,7 @@ exports.createPayment=async(req,res)=>{
     }
 }
 
-exports.createPaymentId=async(req,res)=>{
+const createPaymentId=async(req,res)=>{
 
     var instance = new razorpay({ 
         key_id: 'rzp_test_MzrI49KUp5riXp', 
@@ -57,7 +57,7 @@ exports.createPaymentId=async(req,res)=>{
   });
 }
 
-exports.getAllPaymentList=(req,res)=>{
+const getAllPaymentList=(req,res)=>{
     try{
         payment.find({deleteFlag:'false'},(err,data)=>{
             if(data){
@@ -73,7 +73,7 @@ exports.getAllPaymentList=(req,res)=>{
     }
 }
 
-exports.getSinglePaymentDetails=(req,res)=>{
+const getSinglePaymentDetails=(req,res)=>{
     try{
         payment.findOne({_id:req.params.id,deleteFlag:'false'},(err,data)=>{
             if(data){
@@ -89,7 +89,7 @@ exports.getSinglePaymentDetails=(req,res)=>{
     }
 }
 
-exports.superAdminPackageDetails=async(req,res)=>{
+const superAdminPackageDetails=async(req,res)=>{
     try{
       const data=await payment.findOne({paymentId:req.params.paymentId})
             if(data){
@@ -113,7 +113,7 @@ exports.superAdminPackageDetails=async(req,res)=>{
     }
 }
 
-exports.userGetOurOwnPaymentDetails=async(req,res)=>{
+const userGetOurOwnPaymentDetails=async(req,res)=>{
     try{
         const userToken=jwt.decode(req.headers.authorization)
          const id=userToken.userId
@@ -135,7 +135,7 @@ exports.userGetOurOwnPaymentDetails=async(req,res)=>{
      }
 }
 
-exports.ownerGetOurOwnPaymentDetails=async(req,res)=>{
+const ownerGetOurOwnPaymentDetails=async(req,res)=>{
     try{
         const ownerToken=jwt.decode(req.headers.authorization)
          const id=ownerToken.userId
@@ -153,4 +153,50 @@ exports.ownerGetOurOwnPaymentDetails=async(req,res)=>{
     }catch(err){
         res.status(500).send({message:'internal server error'})
     }
+}
+
+const TotalEarning=async(req,res)=>{
+    console.log('hai');
+    try{
+        console.log('line 160',12)
+        const data=await payment.aggregate([{$group:{"_id":null,"TotalEarnings":{$sum:"$amount"}}}])
+            console.log('line 162',data)
+            if(data){
+                console.log('....',data)
+                res.status(200).send({success:'true',message:'Total Earnings',data})
+            }else{
+                res.status(400).send({success:'false',message:'failed'})
+            }
+    }catch(err){
+        console.log(err)
+        res.status(500).send({message:'internal server error'})
+    }
+}
+
+const TodayEarning=async(req,res)=>{
+    try{
+        const newEarning=moment(new Date()).toISOString().slice(0,10)
+        console.log('date:',newEarning)
+        const data=await payment.aggregate([{$match:{createdAt:newEarning}},{$group:{"_id":null,"TodayEarnings":{$sum:"$amount"}}}])
+            console.log('line 179',data)
+            if(data){
+                console.log('....',data)
+                res.status(200).send({success:'true',message:'Today Earnings',data})
+            }else{
+                res.status(400).send({success:'false',message:'failed'})
+            }
+    }catch(err){
+        res.status(500).send({message:'internal server error'})
+    }
+}
+module.exports={
+    createPaymentId,
+    createPayment,
+    getAllPaymentList,
+    getSinglePaymentDetails,
+    superAdminPackageDetails,
+    TotalEarning,
+    TodayEarning,
+    userGetOurOwnPaymentDetails,
+    ownerGetOurOwnPaymentDetails
 }

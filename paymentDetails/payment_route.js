@@ -1,19 +1,23 @@
 const router=require('express').Router()
 
-const {createPayment,getAllPaymentList,getSinglePaymentDetails,superAdminPackageDetails,createPaymentId,ownerGetOurOwnPaymentDetails,userGetOurOwnPaymentDetails}=require('./payment_controller')
+const paymentControl=require('./payment_controller')
 
-router.post('/createPayment/:userBookingId',createPayment)
+router.post('/createPayment/:userBookingId',paymentControl.createPayment)
 
-router.get('/createPaymentId',createPaymentId)
+router.get('/createPaymentId',paymentControl.createPaymentId)
 
-router.get('/getAllPaymentList',getAllPaymentList)
+router.get('/getAllPaymentList',paymentControl.getAllPaymentList)
 
-router.get('/getSinglePaymentDetails/:id',getSinglePaymentDetails)
+router.get('/getSinglePaymentDetails/:id',paymentControl.getSinglePaymentDetails)
 
-router.get('/user-paymentHistory',userGetOurOwnPaymentDetails)
+router.get('/user-paymentHistory',paymentControl.userGetOurOwnPaymentDetails)
 
-router.get('/owner-paymentHistory',ownerGetOurOwnPaymentDetails)
+router.get('/owner-paymentHistory',paymentControl.ownerGetOurOwnPaymentDetails)
 
-router.get('/packageDetails/:userBookingId/:paymentId',superAdminPackageDetails)
+router.get('/packageDetails/:userBookingId/:paymentId',paymentControl.superAdminPackageDetails)
+
+router.get('/total-Earning',paymentControl.TotalEarning)
+
+router.get('/today-Earning',paymentControl.TodayEarning)
 
 module.exports=router

@@ -13,7 +13,8 @@ const registerForAll=(req,res)=>{
         register.countDocuments({email:req.body.email},async(err,num)=>{
             if(num==0){
                 console.log('line 10',num)
-                req.body.password = await bcrypt.hashSync(req.body.password, 10)
+                req.body.password = await bcrypt.hash(req.body.password, 10)
+                
                 req.body.createdAt=moment(new Date()).toISOString().slice(0,10)
                 console.log('line 17',req.body.createdAt)
                 register.create(req.body,async(err,data)=>{
@@ -160,9 +161,40 @@ const TotalOwner=async(req,res)=>{
 }
 const TodayUser=async(req,res)=>{
     try{
-
+        const newUser=moment(new Date()).toISOString().slice(0,10)
+        const data=await register.aggregate([{$match:{$and:[{createdAt:newUser},{typeOfRole:'user'},{deleteFlag:"false"}]}}])
+            if(data){
+                const count=data.length
+                if(count!=0){
+                    res.status(200).send({success:'true',message:'new user',count})
+            } else{
+                res.status(302).send({success:'false',message:'data not found',data:[]})
+            }
+            }else{
+                res.status(302).send({success:'false',message:'failed'})
+            }
     }catch(err){
-
+        res.status(500).send({message:err.message})
+    }
+}
+const TodayOwner=async(req,res)=>{
+    try{
+        const newOwner=moment(new Date()).toISOString().slice(0,10)
+        console.log('line 182',newOwner)
+        const data=await register.aggregate([{$match:{$and:[{createdAt:newOwner},{typeOfRole:'owner'},{deleteFlag:"false"}]}}])
+            if(data){
+                console.log('line ....',data)
+                const count=data.length
+                if(count!=0){
+                    res.status(200).send({success:'true',message:'new owner',count})
+            } else{
+                res.status(302).send({success:'false',message:'data not found',data:[]})
+            }
+            }else{
+                res.status(302).send({success:'false',message:'failed'})
+            }
+    }catch(err){
+        res.status(500).send({message:err.message})
     }
 }
 const forgetPassword=(req,res)=>{
@@ -260,5 +292,8 @@ module.exports={
     login,
     verificationOtp,
     forgetPassword,
-    TotalUser,TotalOwner,TodayUser
+    TotalUser,
+    TotalOwner,
+    TodayUser,
+    TodayOwner
 }

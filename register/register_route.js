@@ -18,4 +18,8 @@ router.get('/total-user',registerControl.TotalUser)
 
 router.get('/total-owner',registerControl.TotalOwner)
 
+router.get('/today-user',registerControl.TodayUser)
+
+router.get('/today-owner',registerControl.TodayOwner)
+
 module.exports=router

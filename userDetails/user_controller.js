@@ -260,7 +260,42 @@ const createUserprofileAccountDetails=async(req,res)=>{
         res.status(500).send({message:'internal server error'})
     }
 }
+const TotalRide=async(req,res)=>{
+    try{
+        const data=await userBooking.aggregate([{$match:{$and:[{rideStatus:"rideFinish"},{deleteFlag:'false'}]}}])
+            if(data){
+                const count=data.length
+                if(count!=0){
+                    res.status(200).send({success:'true',message:'Total ride',count})
+            } else{
+                res.status(302).send({success:'false',message:'data not found',data:[]})
+            }
+            }else{
+                res.status(302).send({success:'false',message:'failed'})
+            }
+    }catch(err){
+        res.status(500).send({message:'internal server error'})
+    }
+}
 
+const TodayRide=async(req,res)=>{
+    try{
+        const newRide=moment(new Date()).toISOString().slice(0,10)
+        const data=await userBooking.aggregate([{$match:{$and:[{rideStatus:"rideFinish"},{createdAt:newRide},{deleteFlag:'false'}]}}])
+            if(data){
+                const count=data.length
+                if(count!=0){
+                    res.status(200).send({success:'true',message:'Today ride',count})
+            } else{
+                res.status(302).send({success:'false',message:'data not found',data:[]})
+            }
+            }else{
+                res.status(302).send({success:'false',message:'failed'})
+            }
+    }catch(err){
+        res.status(500).send({message:'internal server error'}) 
+    }
+}
 const getAllUserList=async(req,res)=>{
     try{
        const data= await register.aggregate([{$match:{$and:[{typeOfRole:"user",deleteFlag:"false"}]}}])
@@ -335,12 +370,17 @@ module.exports={
     userBookingCab,
     getAllUserBookingDetails,
     getSingleUserBookingDetails,
-    userSearch,
+    userGetOurPreviousBookingHistory,
+    userGetOurOwnBookingHistory,
+    getAllPendingBookingDetails,
+
+    TotalRide,
+    TodayRide,
     createUserprofileAccountDetails,
     getAllUserList,
     getSingleUserDetails,
-    userGetOurPreviousBookingHistory,
-    updateUserProfile,deleteUserProfile,
-    userGetOurOwnBookingHistory,
-    getAllPendingBookingDetails
+    updateUserProfile,
+    deleteUserProfile,
+    userSearch
 }
+   

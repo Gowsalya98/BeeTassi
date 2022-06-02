@@ -6,7 +6,7 @@ const jwt=require('jsonwebtoken')
 const bcrypt=require('bcrypt')
 const { userBooking } = require('../userDetails/user_model')
 
-exports.addDriver=(req,res)=>{
+const addDriver=(req,res)=>{
     try{
         console.log('line 8',req.body)
         driverDetails.countDocuments({email:req.body.email }, async (err, num) => {
@@ -61,7 +61,7 @@ const postMail = function ( to, subject, text) {
         text:text
     })
 }
-exports.verifyUserOtp=(req,res)=>{
+const verifyUserOtp=(req,res)=>{
     try{
         console.log('line 36',req.body.otp)
         sendOtp.findOne({otp:req.body.otp},(err,data)=>{
@@ -88,7 +88,7 @@ exports.verifyUserOtp=(req,res)=>{
     }
 }
 
-exports.driverUpdateRideStatus=(req,res)=>{
+const driverUpdateRideStatus=(req,res)=>{
     try{
         console.log('line 62',req.params);
         userBooking.findOne({_id:req.params.userBookingId},(err,datas)=>{
@@ -108,7 +108,43 @@ exports.driverUpdateRideStatus=(req,res)=>{
         res.status(500).send({message:err.message})
     }
 }
-exports.getAllDriverList=(req,res)=>{
+const TotalDriver=async(req,res)=>{
+    try{
+        const data=await driverDetails.aggregate([{$match:{$and:[{typeOfRole:'driver'},{deleteFlag:"false"}]}}])
+        if(data){
+            const count=data.length
+            if(count!=0){
+                res.status(200).send({success:'true',message:'Total Driver',count})
+            } else{
+                res.status(302).send({success:'false',message:'data not found',data:[]})
+            }
+        }else{
+            res.status(302).send({success:'false',message:'failed'})
+        }
+    }catch(err){
+        res.status(500).send({message:err.message})
+    }
+}
+const TodayDriver=async(req,res)=>{
+    try{
+        const newDriver=moment(new Date()).toISOString().slice(0,10)
+        console.log('line 131',newDriver)
+        const data=await driverDetails.aggregate([{$match:{$and:[{createdAt:newDriver},{typeOfRole:'driver'},{deleteFlag:"false"}]}}])
+            if(data){
+                const count=data.length
+                if(count!=0){
+                    res.status(200).send({success:'true',message:'new driver',count})
+            } else{
+                res.status(302).send({success:'false',message:'data not found',data:[]})
+            }
+            }else{
+                res.status(302).send({success:'false',message:'failed'})
+            }
+    }catch(err){
+        res.status(500).send({message:err.message})
+    }
+}
+const getAllDriverList=(req,res)=>{
     try{
         driverDetails.find({typeOfRole:"driver",deleteFlag:"false"},(err,data)=>{
             if(data){
@@ -124,7 +160,7 @@ exports.getAllDriverList=(req,res)=>{
         res.status(500).send({message:err.message})
     }
 }
-exports.driverAcceptUserRide=async(req,res)=>{
+const driverAcceptUserRide=async(req,res)=>{
     try{
         const driverToken=jwt.decode(req.headers.authorization)
         if(driverToken!=null){
@@ -150,7 +186,7 @@ exports.driverAcceptUserRide=async(req,res)=>{
       res.status(500).send({message:'internal server error'})
     }
   }
-  exports.driverRejectUserRide=async(req,res)=>{
+  const driverRejectUserRide=async(req,res)=>{
     try{
         const driverToken=jwt.decode(req.headers.authorization)
         if(driverToken!=null){
@@ -176,7 +212,7 @@ exports.driverAcceptUserRide=async(req,res)=>{
       res.status(500).send({message:'internal server error'})
     }
   }
-exports.getSingleDriverData=(req,res)=>{
+const getSingleDriverData=(req,res)=>{
     try{
     if(req.headers.authorization){
         driverDetails.findOne({_id:req.params.id,deleteFlag:"false"},(err,data)=>{
@@ -196,7 +232,7 @@ exports.getSingleDriverData=(req,res)=>{
     }
 }
 
-exports.updateDriverProfile=(req,res)=>{
+const updateDriverProfile=(req,res)=>{
     try{
         const driverToken=jwt.decode(req.headers.authorization)
         const id=driverToken.userId
@@ -217,7 +253,7 @@ exports.updateDriverProfile=(req,res)=>{
     }
 }
 
-exports.deleteDriverProfile=(req,res)=>{
+const deleteDriverProfile=(req,res)=>{
     try{
        if(req.headers.authorization){
         driverDetails.findOne({_id:req.params.id,deleteFlag:"false"},(err,data)=>{
@@ -241,4 +277,18 @@ exports.deleteDriverProfile=(req,res)=>{
     }catch(err){
         res.status(500).send({message:err.message})
     }
+}
+
+module.exports={
+    addDriver,
+    verifyUserOtp,
+    driverUpdateRideStatus,
+    driverAcceptUserRide,
+    driverRejectUserRide,
+    TotalDriver,
+    TodayDriver,
+    getAllDriverList,
+    getSingleDriverData,
+    updateDriverProfile,
+    deleteDriverProfile
 }
