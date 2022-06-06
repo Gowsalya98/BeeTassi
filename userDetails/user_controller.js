@@ -160,9 +160,10 @@ const userGetOurOwnBookingHistory=async(req,res)=>{
                if(data[i].createdAt<currantDate){
                    console.log('line 160',data)
                     arr.push(data[i])
-               }else {
-                   res.status(302).send({message:'user does not travel in any place..!'})
-                }
+              }
+              //else {
+            //        res.status(302).send({message:'user does not travel in any place..!'})
+            //     }
                }
             console.log('.....',arr)
             res.status(200).send({success:'true',message:'previous ride details',data})
@@ -262,6 +263,8 @@ const createUserprofileAccountDetails=async(req,res)=>{
 }
 const TotalRide=async(req,res)=>{
     try{
+        const adminToken=jwt.decode(req.headers.authorization)
+        if(adminToken!=null){
         const data=await userBooking.aggregate([{$match:{$and:[{rideStatus:"rideFinish"},{deleteFlag:'false'}]}}])
             if(data){
                 const count=data.length
@@ -273,6 +276,9 @@ const TotalRide=async(req,res)=>{
             }else{
                 res.status(302).send({success:'false',message:'failed'})
             }
+        }else{
+            res.status(302).send({message:'unauthorized'})
+        }
     }catch(err){
         res.status(500).send({message:'internal server error'})
     }
@@ -280,6 +286,8 @@ const TotalRide=async(req,res)=>{
 
 const TodayRide=async(req,res)=>{
     try{
+        const adminToken=jwt.decode(req.headers.authorization)
+        if(adminToken!=null){
         const newRide=moment(new Date()).toISOString().slice(0,10)
         const data=await userBooking.aggregate([{$match:{$and:[{rideStatus:"rideFinish"},{createdAt:newRide},{deleteFlag:'false'}]}}])
             if(data){
@@ -292,6 +300,9 @@ const TodayRide=async(req,res)=>{
             }else{
                 res.status(302).send({success:'false',message:'failed'})
             }
+        }else{
+            res.status(302).send({message:'unauthorized'})
+        }
     }catch(err){
         res.status(500).send({message:'internal server error'}) 
     }

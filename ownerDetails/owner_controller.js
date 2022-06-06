@@ -90,6 +90,30 @@ const ownerGetOurOwnVehicleList=(req,res)=>{
         res.status(500).send({message:err.message})
     }
 }
+const ownerGetOurOwnVehicleCount=async(req,res)=>{
+    try{
+        const ownerToken=jwt.decode(req.headers.authorization)
+        if(ownerToken!=null){
+        const data=await cabDetails.aggregate([{$match:{$and:[{"cabOwnerId":ownerToken.userId},{deleteFlag:"false"}]}}])
+        if(data){
+            console.log('...data:',data)
+            const count=data.length
+            console.log('...count',count)
+            if(count!=0){
+                res.status(200).send({success:'true',message:'Total vehicle',count})
+            } else{
+                res.status(302).send({success:'false',message:'data not found',data:[]})
+            }
+        }else{
+            res.status(302).send({success:'false',message:'failed'})
+        }
+    }else{
+        res.status(302).send({success:'false',message:'unauthorized'})
+    }
+    }catch(err){
+        res.status(500).send({message:err.message})  
+    }
+}
 const ownergetOurOwnCabBookingHistory=async(req,res)=>{
     try{
         try{
@@ -199,6 +223,7 @@ const deleteOwnerProfile=(req,res)=>{
 module.exports={
     search,ownerGetOurOwnEmployeeList,
     ownerGetOurOwnVehicleList,
+    ownerGetOurOwnVehicleCount,
     createOwnerProfileDetails,
     ownergetOurOwnCabBookingHistory,
     getAllOwnerList,

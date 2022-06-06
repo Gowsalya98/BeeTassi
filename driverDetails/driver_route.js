@@ -9,6 +9,9 @@ router.get('/getSingleDriverData/:id',driverControl.getSingleDriverData)
 router.put('/updateDriverProfile',driverControl.updateDriverProfile)
 router.delete('/deleteDriverProfile/:id',driverControl.deleteDriverProfile)
 
+//owner get our own vehicle count list
+router.get('/owner-driverCount',driverControl.ownerGetOwnDriverCount)
+
 //superAdmin driver count list
 router.get('/total-driver',driverControl.TotalDriver)
 router.get('/today-driver',driverControl.TodayDriver)

@@ -3,12 +3,17 @@ const jwt=require('jsonwebtoken')
 const nodemailer=require('nodemailer')
 const fast2sms=require('fast-two-sms')
 const moment=require('moment')
+const {validationResult}=require('express-validator')
 const { register,image,sendOtp} = require('./register_model')
 const {driverDetails}=require('../driverDetails/driver_model')
 const {randomString}=require('../userDetails/random_string')
 
 const registerForAll=(req,res)=>{
     try{
+        const errors =validationResult(req)
+        if(!errors.isEmpty()){
+            return res.status(400).send({errors:errors.array()})
+        }else{
         console.log('line 11',req.body)
         register.countDocuments({email:req.body.email},async(err,num)=>{
             if(num==0){
@@ -44,6 +49,7 @@ const registerForAll=(req,res)=>{
                 res.status(400).send({success:'false',message:'email already exist'})
             }
     })
+}
     }catch(err){
         res.status(500).send({success:'false',message:'internal server error'})
     }
@@ -127,6 +133,8 @@ const login=(req,res)=>{
 }
 const TotalUser=async(req,res)=>{
     try{
+        const adminToken=jwt.decode(req.headers.authorization)
+        if(adminToken!=null){
         const data=await register.aggregate([{$match:{$and:[{typeOfRole:'user'},{deleteFlag:"false"}]}}])
         if(data){
             const count=data.length
@@ -138,12 +146,17 @@ const TotalUser=async(req,res)=>{
         }else{
             res.status(302).send({success:'false',message:'failed'})
         }
+    }else{
+        res.status(400).send({message:'unauthorized'})
+    }
     }catch(err){
         res.status(500).send({message:err.message})
     }
 }
 const TotalOwner=async(req,res)=>{
     try{
+        const adminToken=jwt.decode(req.headers.authorization)
+        if(adminToken!=null){
         const data=await register.aggregate([{$match:{$and:[{typeOfRole:'owner'},{deleteFlag:"false"}]}}])
         if(data){
             const count=data.length
@@ -155,12 +168,17 @@ const TotalOwner=async(req,res)=>{
         }else{
             res.status(302).send({success:'false',message:'failed'})
         }
+    }else{
+        res.status(400).send({message:'unauthorized'})
+    }
     }catch(err){
         res.status(500).send({message:err.message})
     }
 }
 const TodayUser=async(req,res)=>{
     try{
+        const adminToken=jwt.decode(req.headers.authorization)
+        if(adminToken!=null){
         const newUser=moment(new Date()).toISOString().slice(0,10)
         const data=await register.aggregate([{$match:{$and:[{createdAt:newUser},{typeOfRole:'user'},{deleteFlag:"false"}]}}])
             if(data){
@@ -173,26 +191,33 @@ const TodayUser=async(req,res)=>{
             }else{
                 res.status(302).send({success:'false',message:'failed'})
             }
+        }else{
+            res.status(400).send({message:'unauthorized'})
+        }
     }catch(err){
         res.status(500).send({message:err.message})
     }
 }
 const TodayOwner=async(req,res)=>{
     try{
-        const newOwner=moment(new Date()).toISOString().slice(0,10)
-        console.log('line 182',newOwner)
-        const data=await register.aggregate([{$match:{$and:[{createdAt:newOwner},{typeOfRole:'owner'},{deleteFlag:"false"}]}}])
-            if(data){
-                console.log('line ....',data)
-                const count=data.length
-                if(count!=0){
-                    res.status(200).send({success:'true',message:'new owner',count})
-            } else{
-                res.status(302).send({success:'false',message:'data not found',data:[]})
-            }
-            }else{
-                res.status(302).send({success:'false',message:'failed'})
-            }
+        const adminToken=jwt.decode(req.headers.authorization)
+        if(adminToken!=null){
+            const newOwner=moment(new Date()).toISOString().slice(0,10)
+            console.log('line 182',newOwner)
+            const data=await register.aggregate([{$match:{$and:[{createdAt:newOwner},{typeOfRole:'owner'},{deleteFlag:"false"}]}}])
+                if(data.length!=0){
+                    console.log('line ....',data)
+                    const count=data.length
+                    if(count!=0){
+                        res.status(200).send({success:'true',message:'new owner',count})
+                        } else{
+                            res.status(302).send({success:'false',message:'data not found',data:[]})
+                        }
+                }else{
+                res.status(302).send({success:'false',message:'data is empty'}) }
+        }else{
+            res.status(400).send({message:'unauthorized'})
+        }
     }catch(err){
         res.status(500).send({message:err.message})
     }

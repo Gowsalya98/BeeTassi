@@ -108,8 +108,35 @@ const driverUpdateRideStatus=(req,res)=>{
         res.status(500).send({message:err.message})
     }
 }
+const ownerGetOwnDriverCount=async(req,res)=>{
+    try{
+        const ownerToken=jwt.decode(req.headers.authorization)
+        if(ownerToken!=null){
+        const data=await driverDetails.aggregate([{$match:{$and:[{typeOfRole:'driver'},{"ownerId":ownerToken.userId},{deleteFlag:"false"}]}}])
+        if(data){
+            console.log('...data:',data)
+            const count=data.length
+            console.log('...count',count)
+            if(count!=0){
+                res.status(200).send({success:'true',message:'Total Driver',count})
+            } else{
+                res.status(302).send({success:'false',message:'data not found',data:[]})
+            }
+        }else{
+            res.status(302).send({success:'false',message:'failed'})
+        }
+    }else{
+        res.status(302).send({success:'false',message:'unauthorized'})
+    }
+    }catch(err){
+        res.status(500).send({message:err.message}) 
+    }
+}
+
 const TotalDriver=async(req,res)=>{
     try{
+        const adminToken=jwt.decode(req.headers.authorization)
+        if(adminToken!=null){
         const data=await driverDetails.aggregate([{$match:{$and:[{typeOfRole:'driver'},{deleteFlag:"false"}]}}])
         if(data){
             const count=data.length
@@ -121,12 +148,17 @@ const TotalDriver=async(req,res)=>{
         }else{
             res.status(302).send({success:'false',message:'failed'})
         }
+    }else{
+        res.status(302).send({success:'false',message:'unauthorized'})
+    }
     }catch(err){
         res.status(500).send({message:err.message})
     }
 }
 const TodayDriver=async(req,res)=>{
     try{
+        const adminToken=jwt.decode(req.headers.authorization)
+        if(adminToken!=null){
         const newDriver=moment(new Date()).toISOString().slice(0,10)
         console.log('line 131',newDriver)
         const data=await driverDetails.aggregate([{$match:{$and:[{createdAt:newDriver},{typeOfRole:'driver'},{deleteFlag:"false"}]}}])
@@ -140,6 +172,9 @@ const TodayDriver=async(req,res)=>{
             }else{
                 res.status(302).send({success:'false',message:'failed'})
             }
+        }else{
+            res.status(302).send({success:'false',message:'unauthorized'}) 
+        }
     }catch(err){
         res.status(500).send({message:err.message})
     }
@@ -285,6 +320,7 @@ module.exports={
     driverUpdateRideStatus,
     driverAcceptUserRide,
     driverRejectUserRide,
+    ownerGetOwnDriverCount,
     TotalDriver,
     TodayDriver,
     getAllDriverList,

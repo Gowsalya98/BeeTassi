@@ -6,6 +6,8 @@ router.get('/ownerGetOurOwnEmployeeList',ownerControl.ownerGetOurOwnEmployeeList
 
 router.get('/ownerGetOurOwnVehicleList',ownerControl.ownerGetOurOwnVehicleList)
 
+router.get('/owner-cabCount',ownerControl.ownerGetOurOwnVehicleCount)
+
 router.get('/ownergetOurOwnCabBookingHistory',ownerControl.ownergetOurOwnCabBookingHistory)
 
 router.put('/ownerProfile',ownerControl.createOwnerProfileDetails)

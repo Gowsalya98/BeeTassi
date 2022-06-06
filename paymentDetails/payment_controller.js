@@ -158,15 +158,19 @@ const ownerGetOurOwnPaymentDetails=async(req,res)=>{
 const TotalEarning=async(req,res)=>{
     console.log('hai');
     try{
-        console.log('line 160',12)
+        const adminToken=jwt.decode(req.headers.authorization)
+        if(adminToken!=null){
         const data=await payment.aggregate([{$group:{"_id":null,"TotalEarnings":{$sum:"$amount"}}}])
             console.log('line 162',data)
             if(data){
                 console.log('....',data)
                 res.status(200).send({success:'true',message:'Total Earnings',data})
             }else{
-                res.status(400).send({success:'false',message:'failed'})
+                res.status(400).send({success:'false',message:'unauthorized'})
             }
+        }else{
+            res.status(400).send({success:'false',message:'unauthorized'}) 
+        }
     }catch(err){
         console.log(err)
         res.status(500).send({message:'internal server error'})
@@ -175,6 +179,8 @@ const TotalEarning=async(req,res)=>{
 
 const TodayEarning=async(req,res)=>{
     try{
+        const adminToken=jwt.decode(req.headers.authorization)
+        if(adminToken!=null){
         const newEarning=moment(new Date()).toISOString().slice(0,10)
         console.log('date:',newEarning)
         const data=await payment.aggregate([{$match:{createdAt:newEarning}},{$group:{"_id":null,"TodayEarnings":{$sum:"$amount"}}}])
@@ -185,6 +191,9 @@ const TodayEarning=async(req,res)=>{
             }else{
                 res.status(400).send({success:'false',message:'failed'})
             }
+        }else{
+            res.status(400).send({success:'false',message:'unauthorized'})  
+        }
     }catch(err){
         res.status(500).send({message:'internal server error'})
     }
