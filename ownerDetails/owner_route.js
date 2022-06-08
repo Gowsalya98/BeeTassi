@@ -6,10 +6,20 @@ router.get('/ownerGetOurOwnEmployeeList',ownerControl.ownerGetOurOwnEmployeeList
 
 router.get('/ownerGetOurOwnVehicleList',ownerControl.ownerGetOurOwnVehicleList)
 
-router.get('/owner-cabCount',ownerControl.ownerGetOurOwnVehicleCount)
-
 router.get('/ownergetOurOwnCabBookingHistory',ownerControl.ownergetOurOwnCabBookingHistory)
 
+//owner get own ride details count list
+router.get('/owner-cabCount',ownerControl.ownerGetOurOwnVehicleCount)
+
+router.get('/ownTotal-ride',ownerControl.ownerGetOurOwnRideCount)
+
+router.get('/pending-rideCount',ownerControl.pendingRideCount)
+
+router.get('/complete-rideCount',ownerControl.completeRideCount)
+
+router.get('/upcoming-rideCount',ownerControl.upcomingRideCount)
+
+//owner profile details
 router.put('/ownerProfile',ownerControl.createOwnerProfileDetails)
 
 router.get('/getAllOwnerList',ownerControl.getAllOwnerList)

@@ -36,10 +36,10 @@ const registerSchema=mongoose.Schema({
         type:String,
         default:""
     },
-    ownerStatus:{
-        type:String,
-        default:'pending'
-    },
+    // ownerStatus:{
+    //     type:String,
+    //     default:'pending'
+    // },
     typeOfRole:String,
     createdAt:String,
     deleteFlag:{

@@ -80,6 +80,8 @@ const userBookingCab= async(req, res) => {
                                           const count=cab.perKMPrice*req.body.travelDistance
                                           req.body.price=count
                                           console.log('line 43',req.body.price)
+                                        const data=await cabDetails.findOneAndUpdate({_id:req.params.cabId},{$set:{"cabDetails.cabStatus":'booked'}},{new:true})
+                                            if(data!=null){
                                           req.body.createdAt=moment(new Date()).toISOString().slice(0,10)
                                           console.log('line 48',req.body)
                                 userBooking.create(req.body,async(err,result)=>{
@@ -90,6 +92,8 @@ const userBookingCab= async(req, res) => {
                                             res.status(302).send({success:'false',message:'failed to booking'})
                                         }
                             })
+                        }else{res.status(302).send({message:'something wrong'})}
+                    
                         }else{
                             res.status(302).send({success:"false",message:'failed',data:[]})
                         }
@@ -151,13 +155,15 @@ const userGetOurOwnBookingHistory=async(req,res)=>{
  }
  const userGetOurPreviousBookingHistory=async(req,res)=>{
      try{
-     userBooking.find({},(err,data)=>{
-        if(data){
+         const userToken=jwt.decode(req.headers.authorization)
+         if(userToken!=null){
+        const data=await userBooking.aggregate([{$match:{$and:[{rideStatus:'rideFinish'},{deleteFlag:'false'}]}}])
+        if(data!=null){
             console.log('line 156',data)
             const currantDate=moment(new Date()).toISOString().slice(0,10)
             var arr=[]
             for(i=0;i<data.length;i++){
-               if(data[i].createdAt<currantDate){
+               if(data[i].selectDate<currantDate){
                    console.log('line 160',data)
                     arr.push(data[i])
               }
@@ -170,7 +176,9 @@ const userGetOurOwnBookingHistory=async(req,res)=>{
         }else{
             res.status(302).send({success:'false',message:'failed'})
         }
-     })
+    }else{
+        res.status(302).send({success:'false',message:'unauthorized'})
+    }
      }catch(err){
         res.status(500).send({message:'internal server error'})
      }
@@ -196,8 +204,9 @@ const getAllUserBookingDetails=async(req,res)=>{
 }
 const getAllPendingBookingDetails=async(req,res)=>{
     try{
-        const data=await userBooking.aggregate([{$match:{$and:[{rideStatus:'available'},{deleteFlag:false}]}}])
+        const data=await userBooking.aggregate([{$match:{$and:[{rideStatus:'pending'},{deleteFlag:"false"}]}}])
         if(data){
+            data.sort().reverse()
             res.status(200).send({success:'true',message:'pending booking details',data:data})
         }else{
             res.status(302).send({success:'false',message:'data not found',data:[]})
@@ -206,6 +215,7 @@ const getAllPendingBookingDetails=async(req,res)=>{
         res.status(500).send({message:'internal server error'})
     }
 }
+
 const getSingleUserBookingDetails=async(req,res)=>{
     try{
         if(req.headers.authorization){
@@ -384,6 +394,7 @@ module.exports={
     userGetOurPreviousBookingHistory,
     userGetOurOwnBookingHistory,
     getAllPendingBookingDetails,
+    
 
     TotalRide,
     TodayRide,

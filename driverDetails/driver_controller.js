@@ -1,5 +1,6 @@
 const {driverDetails}=require('./driver_model')
 const {sendOtp,register}=require('../register/register_model')
+const {cabDetails}=require('../vehicleDetails/vehicle_model')
 const nodemailer=require('nodemailer')
 const moment=require('moment')
 const jwt=require('jsonwebtoken')
@@ -94,10 +95,11 @@ const driverUpdateRideStatus=(req,res)=>{
         userBooking.findOne({_id:req.params.userBookingId},(err,datas)=>{
             if(datas){
                 console.log('line 65',datas);
-        userBooking.findOneAndUpdate({_id:req.params.userBookingId},{$set:{rideStatus:'rideFinish'}},{new:true},(err,result)=>{
+        userBooking.findOneAndUpdate({_id:req.params.userBookingId},{$set:{rideStatus:'rideFinish',"cabDetails.cabStatus":'available'}},{new:true},(err,result)=>{
                     if(result){
-                        console.log('line 46',result)
-                        res.status(200).send({message:'your ride should be end successfully',result})
+                        cabDetails.findOneAndUpdate({_id:req.params.cabId},{$set:{cabStatus:'available'}},{new:true},(err,result1)=>{
+                        res.status(200).send({message:'your ride should be end successfully',result,result1})
+                        })
                     }else{
                         res.status(400).send({message:'something wrong,please try again'})
                     }
@@ -113,18 +115,12 @@ const ownerGetOwnDriverCount=async(req,res)=>{
         const ownerToken=jwt.decode(req.headers.authorization)
         if(ownerToken!=null){
         const data=await driverDetails.aggregate([{$match:{$and:[{typeOfRole:'driver'},{"ownerId":ownerToken.userId},{deleteFlag:"false"}]}}])
-        if(data){
-            console.log('...data:',data)
+        if(data!=null){
             const count=data.length
-            console.log('...count',count)
-            if(count!=0){
                 res.status(200).send({success:'true',message:'Total Driver',count})
             } else{
                 res.status(302).send({success:'false',message:'data not found',data:[]})
             }
-        }else{
-            res.status(302).send({success:'false',message:'failed'})
-        }
     }else{
         res.status(302).send({success:'false',message:'unauthorized'})
     }
@@ -132,7 +128,48 @@ const ownerGetOwnDriverCount=async(req,res)=>{
         res.status(500).send({message:err.message}) 
     }
 }
-
+const TotalRideForDriver=async(req,res)=>{
+    try{
+        const driverToken=jwt.decode(req.headers.authorization)
+        if(driverToken!=null){
+            const data=await userBooking.aggregate([{$match:{$and:[{"cabDetails.driverId":driverToken.userId},{deleteFlag:"false"}]}}])
+            if(data!=null){
+                data.sort().reverse()
+                res.status(200).send({success:'true',message:'Total Ride for driver',data})
+            }else{
+                res.status(302).send({success:'false',message:'data not found',data:[]})
+            }
+        }else{
+            res.status(302).send({success:'false',message:'unauthorized'})
+        }
+    }catch(err){
+        res.status(500).send({message:'internal server error'})
+    }
+}
+const currentDayRideForDriver=async(req,res)=>{
+    try{
+        const driverToken=jwt.decode(req.headers.authorization)
+        if(driverToken!=null){
+            const data=await userBooking.aggregate([{$match:{$and:[{"cabDetails.driverId":driverToken.userId},{deleteFlag:"false"}]}}])
+            if(data!=null){
+                const today=moment(new Date()).toISOString().slice(0,10)
+                var arr=[]
+                data.map((result)=>{
+                    if(today==result.createdAt){
+                        arr.push(result)
+                    }
+                })
+                res.status(200).send({success:'true',message:'current day Ride for driver',arr})
+            }else{
+                res.status(302).send({success:'false',message:'data not found',data:[]})
+            }
+        }else{
+            res.status(302).send({success:'false',message:'unauthorized'})
+        }
+    }catch(err){
+        res.status(500).send({message:'internal server error'})
+    }
+}
 const TotalDriver=async(req,res)=>{
     try{
         const adminToken=jwt.decode(req.headers.authorization)
@@ -247,6 +284,7 @@ const driverAcceptUserRide=async(req,res)=>{
       res.status(500).send({message:'internal server error'})
     }
   }
+
 const getSingleDriverData=(req,res)=>{
     try{
     if(req.headers.authorization){
@@ -316,15 +354,20 @@ const deleteDriverProfile=(req,res)=>{
 
 module.exports={
     addDriver,
+    getAllDriverList,
+    getSingleDriverData,
+    updateDriverProfile,
+    deleteDriverProfile,
+
     verifyUserOtp,
     driverUpdateRideStatus,
     driverAcceptUserRide,
     driverRejectUserRide,
+
+    TotalRideForDriver,
+    currentDayRideForDriver,
     ownerGetOwnDriverCount,
     TotalDriver,
-    TodayDriver,
-    getAllDriverList,
-    getSingleDriverData,
-    updateDriverProfile,
-    deleteDriverProfile
+    TodayDriver
+  
 }

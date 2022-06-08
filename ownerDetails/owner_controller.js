@@ -2,9 +2,8 @@ const {userBooking}=require('../userDetails/user_model')
 const {register}=require('../register/register_model')
 const {driverDetails}=require('../driverDetails/driver_model')
 const{cabDetails}=require('../vehicleDetails/vehicle_model')
-
 const jwt=require('jsonwebtoken')
-
+const moment=require('moment')
 
 const search = async(req, res) => {
     console.log(req.params.key)
@@ -95,18 +94,12 @@ const ownerGetOurOwnVehicleCount=async(req,res)=>{
         const ownerToken=jwt.decode(req.headers.authorization)
         if(ownerToken!=null){
         const data=await cabDetails.aggregate([{$match:{$and:[{"cabOwnerId":ownerToken.userId},{deleteFlag:"false"}]}}])
-        if(data){
-            console.log('...data:',data)
-            const count=data.length
-            console.log('...count',count)
-            if(count!=0){
+        if(data!=null){
+                 const count=data.length
                 res.status(200).send({success:'true',message:'Total vehicle',count})
             } else{
                 res.status(302).send({success:'false',message:'data not found',data:[]})
             }
-        }else{
-            res.status(302).send({success:'false',message:'failed'})
-        }
     }else{
         res.status(302).send({success:'false',message:'unauthorized'})
     }
@@ -122,6 +115,7 @@ const ownergetOurOwnCabBookingHistory=async(req,res)=>{
             if(id!=null){
                 const data=await userBooking.aggregate([{$match:{$and:[{"cabDetails.cabOwnerId":(id)},{deleteFlag:'false'}]}}])
                 if(data.length!=0){
+                    data.sort().reverse()
                    res.status(200).send({success:'true',message:' booking history',data:data})
                 }else{
                    res.status(302).send({success:'false',message:'data not found',data:[]})
@@ -134,6 +128,91 @@ const ownergetOurOwnCabBookingHistory=async(req,res)=>{
         }
     }catch(err){
         res.status(500).send({message:'internal server error'})
+    }
+}
+const completeRideCount=async(req,res)=>{
+    try{
+        const ownerToken=jwt.decode(req.headers.authorization)
+        if(ownerToken!=null){
+            console.log('line 145',ownerToken)
+            const data=await userBooking.aggregate([{$match:{$and:[{"cabDetails.cabOwnerId":ownerToken.userId},{rideStatus:'rideFinish'},{deleteFlag:"false"}]}}])
+            console.log('.....',data)
+            if(data){
+                const count=data.length
+                res.status(200).send({success:'true',message:'Total Ride',data:count})
+            }else{
+                res.status(400).send({success:'false',message:'data not found',data:[]})
+            }
+        }else{
+            res.status(302).send({success:'false',message:'unauthorized'})
+        }   
+    }catch(err){
+        res.status(500).send({message:'internal server error'})
+    }
+}
+const ownerGetOurOwnRideCount=async(req,res)=>{
+    try{
+        const ownerToken=jwt.decode(req.headers.authorization)
+        if(ownerToken!=null){
+            console.log('line 145',ownerToken)
+            const data=await userBooking.aggregate([{$match:{$and:[{"cabDetails.cabOwnerId":ownerToken.userId},{deleteFlag:"false"}]}}])
+            console.log('.....',data)
+            if(data){
+                const count=data.length
+                res.status(200).send({success:'true',message:'Total Ride',data:count})
+            }else{
+                res.status(400).send({success:'false',message:'data not found',data:[]})
+            }
+        }else{
+            res.status(302).send({success:'false',message:'unauthorized'})
+        }   
+    }catch(err){
+        res.status(500).send({message:'internal server error'})
+    }
+}
+const pendingRideCount=async(req,res)=>{
+    try{
+        const ownerToken=jwt.decode(req.headers.authorization)
+        if(ownerToken!=null){
+            const data=await userBooking.aggregate([{$match:{$and:[{rideStatus:'pending'},{"cabDetails.cabOwnerId":ownerToken.userId},{deleteFlag:"false"}]}}])
+                if(data!=null){
+                    const count=data.length
+                    res.status(200).send({success:'true',message:'pending booking count',count})
+                }else{
+                    res.status(302).send({success:'false',message:'data not found',data:[]})
+                }
+        }else{
+            res.status(400).send({succcess:'false',message:'unauthorized'})
+        }
+       
+    }catch(err){
+        res.status(500).send({message:'internal server error'})
+    }
+}
+const upcomingRideCount=async(req,res)=>{
+    try{
+        const ownerToken=jwt.decode(req.headers.authorization)
+        if(ownerToken!=null){
+            const data=await userBooking.aggregate([{$match:{$and:[{"cabDetails.cabOwnerId":ownerToken.userId},{deleteFlag:"false"}]}}])
+            if(data!=null){
+                const currantDate=moment(new Date()).toISOString().slice(0,10)
+                var arr=[]
+                data.map((result)=>{
+                    if(currantDate<result.selectDate){
+                        arr.push(result)
+                    }
+                })
+                const datas=arr.length
+                res.status(200).send({succcess:'true',message:'upcoming ride count',datas})
+            }else{
+                res.status(302).send({success:'false',message:'failed'}) 
+            }
+        }else{
+            res.status(400).send({success:'false',message:'unauthorized'})
+        }
+    }catch(err){
+        console.log(err)
+        res.status(500).send({success:'false',message:'internal server error'})
     }
 }
 const getAllOwnerList=(req,res)=>{
@@ -223,9 +302,15 @@ const deleteOwnerProfile=(req,res)=>{
 module.exports={
     search,ownerGetOurOwnEmployeeList,
     ownerGetOurOwnVehicleList,
-    ownerGetOurOwnVehicleCount,
-    createOwnerProfileDetails,
     ownergetOurOwnCabBookingHistory,
+
+    ownerGetOurOwnRideCount,
+    completeRideCount,
+    ownerGetOurOwnVehicleCount,
+    pendingRideCount,
+    upcomingRideCount,
+
+    createOwnerProfileDetails,
     getAllOwnerList,
     getSingleOwnerDetails,
     updateOwnerProfile,

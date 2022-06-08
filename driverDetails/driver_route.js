@@ -9,6 +9,12 @@ router.get('/getSingleDriverData/:id',driverControl.getSingleDriverData)
 router.put('/updateDriverProfile',driverControl.updateDriverProfile)
 router.delete('/deleteDriverProfile/:id',driverControl.deleteDriverProfile)
 
+router.post('/verifyUserOtp',driverControl.verifyUserOtp)
+
+//driver get our own ride details
+router.get('/TotalRide',driverControl.TotalRideForDriver)
+router.get('/TodayRide',driverControl.currentDayRideForDriver)
+
 //owner get our own vehicle count list
 router.get('/owner-driverCount',driverControl.ownerGetOwnDriverCount)
 
@@ -17,10 +23,9 @@ router.get('/total-driver',driverControl.TotalDriver)
 router.get('/today-driver',driverControl.TodayDriver)
 
 //router.post('/login',valid.validation,login)
-router.post('/verifyUserOtp',driverControl.verifyUserOtp)
 
 //driver update ride finish or not
-router.get('/driverUpdateRideStatus/:userBookingId',driverControl.driverUpdateRideStatus)
+router.get('/driverUpdateRideStatus/:userBookingId/:cabId',driverControl.driverUpdateRideStatus)
 
 //driver accept and reject user ride
 router.get('/acceptUserRide/:bookingId',driverControl.driverAcceptUserRide)

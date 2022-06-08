@@ -154,7 +154,65 @@ const ownerGetOurOwnPaymentDetails=async(req,res)=>{
         res.status(500).send({message:'internal server error'})
     }
 }
-
+const ownerGetOwnPaymentCount=async(req,res)=>{
+    try{
+        const ownerToken=jwt.decode(req.headers.authorization)
+        if(ownerToken!=null){
+            const data=await payment.aggregate([{$match:{"user.cabDetails.cabOwnerId":ownerToken.userId}},{$group:{"_id":null,"TotalPayout":{$sum:"$amount"}}}])
+            if(data!=null){
+                res.status(200).send({success:'true',message:'owner get own total payment',data:data})
+            }else{
+                res.status(302).send({success:'false',message:'data not found',data:[]})
+            }
+        }else{
+            res.status(302).send({success:'false',message:'unauthorized'})
+        }
+    }catch(err){
+        res.status(500).send({message:'internal server error'})
+    }
+}
+const driverGetOwnTotalPayouts=async(req,res)=>{
+    try{
+        const driverToken=jwt.decode(req.headers.authorization)
+        if(driverToken!=null){
+            const data=await payment.aggregate([{$match:{"user.cabDetails.driverId":driverToken.userId}}])
+            if(data!=null){
+            data.sort().reverse()
+            res.status(200).send({success:'true',message:'driver own payment details',data:data})
+            }else{
+                res.status(302).send({success:'false',message:'data not found'})   
+            }
+        }else{
+            res.status(302).send({success:'false',message:'unauthorized'})
+        }
+    }catch(err){
+        res.status(500).send({message:'internal server error'})
+    }
+}
+const driverGetOwnTodayPayouts=async(req,res)=>{
+    try{
+        const driverToken=jwt.decode(req.headers.authorization)
+        if(driverToken!=null){
+            const data=await payment.aggregate([{$match:{"user.cabDetails.driverId":driverToken.userId}}])
+            if(data!=null){
+                const today=moment(new Date()).toISOString().slice(0,10)
+                var arr=[]
+                data.map((result)=>{
+                    if(today==result.createdAt){
+                        arr.push(result)
+                    }
+                })
+                res.status(200).send({success:'true',message:'driver own payment details',data:arr})
+            }else{
+                res.status(302).send({success:'false',message:'data not found'})      
+            }
+        }else{
+            res.status(302).send({success:'false',message:'unauthorized'})  
+        }
+    }catch(err){
+        res.status(500).send({message:'internal server error'}) 
+    }
+}
 const TotalEarning=async(req,res)=>{
     console.log('hai');
     try{
@@ -162,7 +220,7 @@ const TotalEarning=async(req,res)=>{
         if(adminToken!=null){
         const data=await payment.aggregate([{$group:{"_id":null,"TotalEarnings":{$sum:"$amount"}}}])
             console.log('line 162',data)
-            if(data){
+            if(data!=null){
                 console.log('....',data)
                 res.status(200).send({success:'true',message:'Total Earnings',data})
             }else{
@@ -204,8 +262,13 @@ module.exports={
     getAllPaymentList,
     getSinglePaymentDetails,
     superAdminPackageDetails,
+    
     TotalEarning,
     TodayEarning,
+    ownerGetOwnPaymentCount,
+
+    driverGetOwnTotalPayouts,
+    driverGetOwnTodayPayouts,
     userGetOurOwnPaymentDetails,
     ownerGetOurOwnPaymentDetails
 }
