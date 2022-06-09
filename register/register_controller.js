@@ -29,7 +29,7 @@ const registerForAll=(req,res)=>{
                         req.body.userDetails=data
                         const datas=await sendOtp.create({otp: otp,userDetails:req.body.userDetails})
                         if (datas) {
-                        postMail(data.email,"verification otp",otp)
+                        //postMail(data.email,"verification otp",otp)
                         const response = await fast2sms.sendMessage({ authorization: process.env.OTPKEY,message:otp,numbers:[req.body.contact]})
                         res.status(200).send({ message: "verification otp send your mobile number,Register Successfull",data:datas})
                         setTimeout(() => {
