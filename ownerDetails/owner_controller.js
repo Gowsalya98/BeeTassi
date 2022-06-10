@@ -112,8 +112,10 @@ const ownergetOurOwnCabBookingHistory=async(req,res)=>{
         try{
             const ownerToken=jwt.decode(req.headers.authorization)
             const id=ownerToken.userId
+            console.log('line 115',id)
             if(id!=null){
                 const data=await userBooking.aggregate([{$match:{$and:[{"cabDetails.cabOwnerId":(id)},{deleteFlag:'false'}]}}])
+               console.log('line 117',data)
                 if(data.length!=0){
                     data.sort().reverse()
                    res.status(200).send({success:'true',message:' booking history',data:data})

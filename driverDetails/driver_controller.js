@@ -27,7 +27,7 @@ const addDriver=(req,res)=>{
                     driverDetails.create(req.body,(err,data)=>{
                         if(err){throw err}
                          else{
-                            postMail( data.email, 'BeeTassi=>your job confirm your login details below here',"email:"+req.body.email+','+"password:"+driverPassword+','+"CabRegisterNumber:"+req.body.carRegNumber)
+                          //  postMail( data.email, 'BeeTassi=>your job confirm your login details below here',"email:"+req.body.email+','+"password:"+driverPassword+','+"CabRegisterNumber:"+req.body.carRegNumber)
                             console.log('line 19',data)
                             res.status(200).send({message:"Register successfully,mail send successfully",data})
                         }
