@@ -1,10 +1,13 @@
 const mongoose=require('mongoose')
 
 const reportSchema=mongoose.Schema({
-
-    cabId:String,
-    message:String,
+    createdAt:String,
+    quotes:String,
+    description:String,
     userDetails:{
+        type:Object
+    },
+    cab:{
         type:Object
     },
     deleteFlag:{
@@ -14,10 +17,18 @@ const reportSchema=mongoose.Schema({
 })
 
 const reviewSchema=mongoose.Schema({
-    cabId:String,
-    message:String,
+    createdAt:String,
+    quotes:String,
+    description:String,
     userDetails:{
         type:Object
+    },
+    cab:{
+        type:Object
+    },
+    deleteFlag:{
+        type:String,
+        default:'false'
     }
 })
 

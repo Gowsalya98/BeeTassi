@@ -43,6 +43,7 @@ const userBookingSchema=mongoose.Schema({
     cabDetails:{
         type:Object 
     },
+    from:String,
     drop:String,
     deleteFlag:{
         type:String,

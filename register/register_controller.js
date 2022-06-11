@@ -101,21 +101,21 @@ const login=(req,res)=>{
                         } else {res.status(400).send({ message: 'password does not match' })}
                     }else{res.status(400).send({message:"something wrong"})}
                 }else if(data==null){
-                    driverDetails.findOne({ email: req.body.email,deleteFlag:"false"},async (err, data) => {
-                        console.log("line 60",data)
-                        if(data!=null){
-                        if (data.typeOfRole=='driver'){
-                            const password=await bcrypt.compare(req.body.password,data.password)
+                    driverDetails.findOne({ email: req.body.email,deleteFlag:"false"},async (err, datas) => {
+                        console.log("line 60",datas)
+                        if(datas!=null){
+                        if (datas.typeOfRole=='driver'){
+                            const password=await bcrypt.compare(req.body.password,datas.password)
                             console.log('line 64',password);
                           //  if (password == true) {
-                                const token = await jwt.sign({ userId: data._id }, process.env.SECRET_KEY)
+                                const token = await jwt.sign({ userId: datas._id }, process.env.SECRET_KEY)
                                 var Location={}
                                 Location.driverLatitude=req.body.driverLocation.driverLatitude
                                 Location.driverLongitude=req.body.driverLocation.driverLongitude
                                     req.body.driverLocation=Location
-                                    driverDetails.findOneAndUpdate({email:req.body.email,deleteFlag:"false"},req.body,{new:true},(err,datas)=>{
-                                        console.log('line 72',datas);
-                                            res.status(200).send({ message: 'login successfull',token,datas })
+                                    driverDetails.findOneAndUpdate({email:req.body.email,deleteFlag:"false"},req.body,{new:true},(err,data)=>{
+                                        console.log('line 72',data);
+                                            res.status(200).send({ message: 'login successfull',token,data })
                             
                         })
                     //}else{res.send({message:'password does not match'})}
