@@ -3,13 +3,13 @@ const bookingControl=require('./user_controller')
 const validationResult=require('../middleware/register_validation')
 
 //user booking
-router.post('/cabBooking',bookingControl.cabBooking)
-router.post('/userBookToCab/:cabId',validationResult.validation,bookingControl.userBookingCab)
+router.post('/userBookToCab/:cabId',validationResult.valid,bookingControl.userBookingCab)
 router.get('/userGetOurOwnBookingHistory',bookingControl.userGetOurOwnBookingHistory)
 router.get('/user-previousBookingHistory',bookingControl.userGetOurPreviousBookingHistory)
 router.get('/getAllPendingBookingDetails',bookingControl.getAllPendingBookingDetails)
 router.get('/getAllUserBookingDetails',bookingControl.getAllUserBookingDetails)
 router.get('/getSingleUserBookingDetails/:userBookingId',bookingControl.getSingleUserBookingDetails)
+//router.post('/cabBooking',bookingControl.cabBooking)
 
 //user details
 router.put('/userProfile',bookingControl.createUserprofileAccountDetails)

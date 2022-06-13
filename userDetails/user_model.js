@@ -29,6 +29,8 @@ const userBookingSchema=mongoose.Schema({
     firstName:String,
     lastName:String,
     email:String,
+    perKMPrice:Number,
+    serviceAmount:Number,
     travelDistance:String,
     price:Number,
     rideStatus:{
@@ -50,8 +52,31 @@ const userBookingSchema=mongoose.Schema({
         default:'false'
     }
 })
-
+const blockedUserSchema=mongoose.Schema({
+    userDetails:Object,
+    deleteFlag:{
+        type:String,
+        default:'false'
+    }
+})
+const cancelBookingSchema=mongoose.Schema({
+    userId:String,
+    userBooking:Object,
+    bookingStatus:{
+        type:String,
+        default:'booked'
+    },
+    penalityAmount:Number,
+    deleteFlag:{
+        type:String,
+        default:'false'
+    }
+})
 
 const userBooking=mongoose.model('userBookingSchema',userBookingSchema)
 
-module.exports={userBooking}
+const blockUser=mongoose.model('blockedUserSchema',blockedUserSchema)
+
+const cancelBooking=mongoose.model('cancelBookingSchema',cancelBookingSchema)
+
+module.exports={userBooking,blockUser,cancelBooking}

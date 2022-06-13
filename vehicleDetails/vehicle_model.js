@@ -25,6 +25,7 @@ const cabDetailsSchema=mongoose.Schema({
     numberOfSeats:Number,
     carRegNumber:String,
     perKMPrice:Number,
+    serviceAmount:Number,
     rcBookNumber:String,
     frontRcBookImage:String,
     backRcBookImage:String,

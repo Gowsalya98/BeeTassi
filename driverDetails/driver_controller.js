@@ -240,7 +240,7 @@ const driverAcceptUserRide=async(req,res)=>{
       console.log('line 131',data)
       if(data){
           console.log('line 133',data.userDetails.email)
-          postMail(data.userDetails.email,"Booking Confirmation","congratulations...!,your booking is accepted")
+          //postMail(data.userDetails.email,"Booking Confirmation","congratulations...!,your booking is accepted")
           const datas=await userBooking.findOneAndUpdate({_id:req.params.bookingId},{$set:{rideStatus:"acceptRide","cabDetails.cabStatus":"booked"}},{new:true})
           if(datas){
               console.log('line 137',datas)
@@ -266,7 +266,7 @@ const driverAcceptUserRide=async(req,res)=>{
       console.log('line 152',data)
       if(data){
           console.log('line 154',data.userDetails.email)
-          postMail(data.userDetails.email,"your booking cancel","oops...!,your booking is rejected")
+         // postMail(data.userDetails.email,"your booking cancel","oops...!,your booking is rejected")
           const datas=await userBooking.findOneAndUpdate({_id:req.params.bookingId},{$set:{rideStatus:"rejectRide","cabDetails.cabStatus":"available"}},{new:true})
           if(datas){
               console.log('line 158',datas)
