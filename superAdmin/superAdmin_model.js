@@ -7,6 +7,17 @@ const superAdminSchema=mongoose.Schema({
     contact:Number,
     newPassword:String,
     confirmPassword:String,
+    profileImage:{type:String,default:'false'},
+    location:String,
+    gender:String,
+    desc:String,
+    education:String,
+    experience:String,
+    aboutMe:String,
+    operationDone:String,
+    degree:String,
+    designation:String,
+    address:String,
     typeOfRole:{
         type:String,
         default:'superAdmin'

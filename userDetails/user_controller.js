@@ -182,6 +182,46 @@ function locationCalc(lat1, lon1,latitude,longitude)
 function toRad(Value) 
     {return Value * Math.PI / 180;}
 
+const userCancelForCab=async(req,res)=>{
+    try{
+        const userToken=jwt.decode(req.headers.authorization)
+        if(userToken!=null){
+            if(req.params.bookingId.length==24){
+                const data1=await userBooking.findOne({_id:req.params.bookingId,deleteFlag:"false"})
+                if(data1!=null){
+                    console.log('line 192',data1)
+                    const data2=await userBooking.findOneAndUpdate({_id:req.params.bookingId},{$set:{rideStatus:'cancelBooking',"cabDetails.cabStatus":'available'}},{new:true})
+                    if(data2!=null){
+                        console.log('line 195',data2)
+                        req.body.userId=userToken.userId
+                        req.body.userBooking=data2
+                        req.body.penalityAmount=data2.price/2
+                        console.log('line 199',req.body.penalityAmount)
+                        req.body.createdAt=moment(new Date()).toISOString().slice(0,10)
+                        const data3=await cancelBooking.create(req.body)
+                        if(data3!=null){
+                            console.log('line 203',data3)
+                            res.status(200).send({success:'true',message:'your booking cancel successfully',data:data3})
+                        }else{
+                            res.status(400).send({success:'false',message:'failed to cancel to our booking'})
+                        }
+                    }else{
+                        res.status(302).send({success:'false',message:'does not update ride details'})
+                    }
+                }else{
+                    res.status(302).send({success:'false',message:'data not found'})
+                }
+            }else{
+                res.status(302).send({success:'false',message:'invalid booking id'})
+            } 
+    }else{
+        res.status(302).send({success:'false',message:'unauthorized'})
+    }
+    }catch(err){
+        console.log(err)
+        res.status(500).send({message:'internal server error'})
+    }
+}
 const userGetOurOwnBookingHistory=async(req,res)=>{
      try{
          const userToken=jwt.decode(req.headers.authorization)
@@ -214,9 +254,6 @@ const userGetOurOwnBookingHistory=async(req,res)=>{
                    console.log('line 160',data)
                     arr.push(data[i])
               }
-              //else {
-            //        res.status(302).send({message:'user does not travel in any place..!'})
-            //     }
                }
             console.log('.....',arr)
             res.status(200).send({success:'true',message:'previous ride details',data})
@@ -464,6 +501,7 @@ const deleteUserProfile=(req,res)=>{
 module.exports={
     //cabBooking,
     userBookingCab,
+    userCancelForCab,
     getAllUserBookingDetails,
     getSingleUserBookingDetails,
     userGetOurPreviousBookingHistory,

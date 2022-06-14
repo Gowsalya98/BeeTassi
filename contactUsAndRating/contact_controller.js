@@ -43,12 +43,12 @@ const getSingleContactUsDetails=async(req,res)=>{
 const ratingForCab=async(req,res)=>{
     try{
         const data=await rating.create(req.body)
-        if(data){
+        if(data!=null){
             const datas=await rating.countDocuments({cabId:data.cabId})
             console.log('line 47',datas);
             const numOfPersons=datas
             const result=await rating.find({cabId:data.cabId},{rating:1,_id:0})
-            if(result){
+            if(result!=null){
                 console.log('line 51',result);
                 let rating=0
                 for(var i=0;i<result.length;i++){
@@ -60,7 +60,7 @@ const ratingForCab=async(req,res)=>{
                 const resvalue = Math.ceil(average)
                 console.log('line 60',resvalue)
                 const grade=await cabDetails.findOneAndUpdate({_id:data.cabId},{$set:{rating:resvalue}},{new:true})
-                    if(grade){
+                    if(grade!=null){
                         console.log('line 64',grade);
                         res.status(200).send({message:'successfull',grade})
                     }else{

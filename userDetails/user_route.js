@@ -9,7 +9,9 @@ router.get('/user-previousBookingHistory',bookingControl.userGetOurPreviousBooki
 router.get('/getAllPendingBookingDetails',bookingControl.getAllPendingBookingDetails)
 router.get('/getAllUserBookingDetails',bookingControl.getAllUserBookingDetails)
 router.get('/getSingleUserBookingDetails/:userBookingId',bookingControl.getSingleUserBookingDetails)
-//router.post('/cabBooking',bookingControl.cabBooking)
+
+//cancel booking
+router.post('/cancel-booking/:bookingId',bookingControl.userCancelForCab)
 
 //user details
 router.put('/userProfile',bookingControl.createUserprofileAccountDetails)

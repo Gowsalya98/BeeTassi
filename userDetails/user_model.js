@@ -60,11 +60,12 @@ const blockedUserSchema=mongoose.Schema({
     }
 })
 const cancelBookingSchema=mongoose.Schema({
+    createdAt:String,
     userId:String,
     userBooking:Object,
     bookingStatus:{
         type:String,
-        default:'booked'
+        default:'cancelBooking'
     },
     penalityAmount:Number,
     deleteFlag:{

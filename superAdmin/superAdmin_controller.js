@@ -63,6 +63,25 @@ exports.superAdminLogin = async (req, res) => {
     }
 }
 
+exports.getAdminProfile=async(req,res)=>{
+    try{
+        const superAdminToken=jwt.decode(req.headers.authorization)
+        if(superAdminToken!=null){
+            const data=await superadmin.aggregate([{$match:{deleteFlag:'false'}}])
+            if(data!=null){
+                res.status(200).send({success:'true',message:'admin profile',data:data})
+            }else{
+                res.status(302).send({success:'false',message:'failed'})
+            }
+        }else{
+            res.status(302).send({success:'false',message:'unauthorized'})
+        }
+    }catch(err){
+        res.status(500).send({message:'internal server error'})
+    }
+}
+
+
 exports.forgetPassword=(req,res)=>{
     console.log('line 64',req.body.email)
     console.log('line 67',req.body.contact)
@@ -72,9 +91,8 @@ exports.forgetPassword=(req,res)=>{
             sendOtp.findOne({ otp: req.body.otp }, async (err, datas) => {
                 console.log("line 76", datas)
                 if (datas) {
-                    const superAdminToken = jwt.decode(req.headers.authorization)
-                    const decodeId = superAdminToken.userid
-                    superadmin.findOne({ _id: decodeId }, async (err, data) => {
+                    
+                    superadmin.findOne({ email:req.body.email,deleteFlag:'false'}, async (err, data) => {
                         console.log("line 81", data)
                         if (data) {
                             if (req.body.email == data.email) {
@@ -85,7 +103,7 @@ exports.forgetPassword=(req,res)=>{
                                     console.log("line 82",req.body.confirmPassword )
 
                                     req.body.newPassword = await bcrypt.hash(req.body.newPassword, 10)
-                                    superadmin.findOneAndUpdate({ _id: decodeId }, { password: req.body.newPassword }, (err, result) => {
+                                    superadmin.findOneAndUpdate({ email:req.body.email}, { password: req.body.newPassword }, (err, result) => {
                                         if (err) { throw err }
                                         else {
                                             res.status(200).send({ message: "Reset Password Successfully", result })
@@ -98,9 +116,7 @@ exports.forgetPassword=(req,res)=>{
                 } else { res.status(400).send({ message: 'invalid otp' }) }
             })
         } else {
-            const superAdminToken = jwt.decode(req.headers.authorization)
-            const decodeId = superAdminToken.userid
-            superadmin.findById({ _id: decodeId },async (err, data) => {
+            superadmin.findOne({ email: req.body.email,deleteFlag:'false' },async (err, data) => {
                 console.log("line 98", data)
                 if (data) {
                     console.log('line 100',req.body.email)

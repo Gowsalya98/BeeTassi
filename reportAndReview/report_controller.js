@@ -88,37 +88,47 @@ const userDeleteOurOwnReportDetails=(req,res)=>{
     }
 }
 
-const createReview=(req,res)=>{
+const createReview=async(req,res)=>{
     try{
         const userToken = jwt.decode(req.headers.authorization)
         const id = userToken.userId
-        register.findOne({_id:id,deleteFlag:'false'},(err,datas)=>{
-            if(!datas){
+        register.findOne({_id:id,deleteFlag:'false'},async(err,data1)=>{
+            if(!data1){
                 res.status(400).send('invalid token')
             }else{
-                req.body.userDetails=datas
-                cabDetails.findOne({_id:req.params.cabId,deleteFlag:'false'},async(err,result)=>{
-                    req.body.cab=result
-                    req.body.createdAt=moment(new Date()).toISOString().slice(0,10)
-                    // var reviews={}
-                    // reviews.description=req.body.description
-                    // req.body.review=reviews
-                    const result1=await cabDetails.findOneAndUpdate({_id:req.params.cabId},{$set:{review:req.body.description}},{new:true})
-                    if(result1){
-                    review.create(req.body,(err,data)=>{
-                    if(data){
-                      res.status(200).send({message:"review post successfully",data})
-                    }else{
-                          res.status(400).send('data not found something issued')
+                req.body.userId=data1._id
+               const data2=await cabDetails.findOne({_id:req.params.cabId,deleteFlag:'false'})
+               if(data2!=null){
+                req.body.cabId=req.params.cabId
+                req.body.createdAt=moment(new Date()).toISOString().slice(0,10)
+                    const data3=await review.create(req.body)
+                    console.log('line 106',data3)
+                    if(data3!=null){
+                    res.status(200).send({message:"review post successfully",data3})
+                    const result1=await cabDetails.findOne({_id:data3.cabId,deleteFlag:"false"})
+                    console.log('line 112',result1);
+                        if(result1!=null){
+                            var arr=[]
+                            result1.review.map((final)=>{
+                            console.log('line 116',final)
+                            arr.push(final)
+                            })
+                              arr.push(req.body)
+                              console.log('line 120',arr)
+                              const result2=await cabDetails.findOneAndUpdate({_id:data3.cabId},{$set:{review:arr}},{new:true})
+                              console.log('line 122',result2)
+                        }else{
+                            res.status(302).send({success:'false',message:'invalid cab id'})
                         }
-                  })
+                    }else{
+                    res.status(400).send({success:'false',message:'failed'})
+                    }
+              
                 }else{
-                    res.status(400).send('data does not update') 
+                    res.status(302).send({success:'false',message:'data not found'})
                 }
-            })
-                
             }
-        }) 
+        })
     }catch(err){
         res.status(500).send({message:err.message})
     }
@@ -129,6 +139,7 @@ const getAllReview=(req,res)=>{
         if(superAdminToken!=null){
             review.find({deleteFlag:"false"},(err,data)=>{
                 if(data!=null){
+                    data.sort().reverse()
                     res.status(200).send({success:'true',message:'All review list',data})
                 }else{
                     res.status(302).send({success:'false',message:'data not found',data:[]})

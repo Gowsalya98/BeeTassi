@@ -20,12 +20,8 @@ const reviewSchema=mongoose.Schema({
     createdAt:String,
     quotes:String,
     description:String,
-    userDetails:{
-        type:Object
-    },
-    cab:{
-        type:Object
-    },
+    cabId:String,
+    userId:String,
     deleteFlag:{
         type:String,
         default:'false'

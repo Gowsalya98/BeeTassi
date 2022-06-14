@@ -6,7 +6,7 @@ const razorpay=require('razorpay')
 const jwt=require('jsonwebtoken')
 const moment=require('moment')
 
-const createPayment=async(req,res)=>{
+const createPayment=async(req,res)=>{ 
     try{
         console.log('line 9',req.body)
         const data=await userBooking.findOne({_id:req.params.userBookingId,deleteFlag:'false'})
