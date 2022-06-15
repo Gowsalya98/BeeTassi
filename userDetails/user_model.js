@@ -32,6 +32,7 @@ const userBookingSchema=mongoose.Schema({
     perKMPrice:Number,
     serviceAmount:Number,
     travelDistance:String,
+    penalityAmount:{type:Number,default:0},
     price:Number,
     rideStatus:{
         type:String,
@@ -53,7 +54,8 @@ const userBookingSchema=mongoose.Schema({
     }
 })
 const blockedUserSchema=mongoose.Schema({
-    userDetails:Object,
+    createdAt:String,
+    blockedUser:Object,
     deleteFlag:{
         type:String,
         default:'false'

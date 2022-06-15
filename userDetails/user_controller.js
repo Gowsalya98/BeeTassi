@@ -21,12 +21,13 @@ const userBookingCab= async(req, res) => {
             const userToken=jwt.decode(req.headers.authorization)
             if(userToken.userId!=null){
                 const data1=await cancelBooking.aggregate([{$match:{$and:[{userId:(userToken.userId)},{deleteFlag:'false'}]}}])
+                console.log('line 24',data1)
                 console.log('line 23',data1.length)
                 if(data1.length==0){
                    const data2=await register.aggregate([{$match:{$and:[{"_id":new mongoose.Types.ObjectId(userToken.userId)},{deleteFlag:"false"}]}}])
                         if(data2!=null){
                             req.body.userId=userToken.userId
-                            req.body.userDetails=data2
+                            req.body.userDetails=data2[0]
                             const otp = randomString(3)
                             console.log("otp", otp) 
                             const data3=await sendOtp.create({otp: otp,userDetails:req.body.userDetails})
@@ -44,9 +45,9 @@ const userBookingCab= async(req, res) => {
                                 console.log('line 43',d)
             
                                 const lat1=req.body.pickUpLocation.pickUpLatitude
-                                console.log('line 46',lat1);
+                                console.log('pickUpLatitude:',lat1);
                                 const lon1 =req.body.pickUpLocation.pickUpLongitude
-                                console.log('line 48',lon1);
+                                console.log('pickUpLongitude:',lon1);
             
                                 const locationOfUser=locationCalc(lat1,lon1,d.dropLatitude,d.dropLongitude).toFixed(1);
                                 req.body.travelDistance=locationOfUser;
@@ -60,7 +61,7 @@ const userBookingCab= async(req, res) => {
                                     req.body.cabId=data4._id
                                     req.body.perKMPrice=data4.perKMPrice
                                     req.body.serviceAmount=data4.serviceAmount
-                                    const count=data4.perKMPrice*req.body.travelDistance
+                                    const count=((data4.perKMPrice)*(req.body.travelDistance/1000))
                                     req.body.price=count+data4.serviceAmount
                                     console.log('line 62',req.body.price)
                                     const data5=await cabDetails.findOneAndUpdate({_id:req.params.cabId},{$set:{"cabDetails.cabStatus":'booked'}},{new:true})
@@ -125,7 +126,9 @@ const userBookingCab= async(req, res) => {
                                      req.body.cabDetails=data4
                                      req.body.cabId=data4._id
                                      const count=data4.perKMPrice*req.body.travelDistance
-                                     req.body.price=count+data4.serviceAmount+data1.penalityAmount
+                                     req.body.serviceAmount=data4.serviceAmount
+                                     req.body.penalityAmount=data1[0].penalityAmount
+                                     req.body.price=count+data4.serviceAmount+data1[0].penalityAmount
                                      console.log('line 130',req.body.price)
                                      const data5=await cabDetails.findOneAndUpdate({_id:req.params.cabId},{$set:{"cabDetails.cabStatus":'booked'}},{new:true})
                                      if(data5!=null){
@@ -152,7 +155,20 @@ const userBookingCab= async(req, res) => {
                          }                            
                       }
                 if(data1.length==2){
-                    //block
+                   const data2=await register.findOne({_id:userToken.userId},{deleteFlag:'false'})
+                   if(data2!=null){
+                        const data3=await register.findOneAndUpdate({_id:userToken.userId},{$set:{userStatus:'inactive'}},{new:true})
+                        console.log('line 161',data3)
+                        if(data3!=null){
+                            const data4=await blockUser.create(req.body)
+                            console.log('line 164',data4)
+                            res.status(200).send({success:'true',message:'your account is blocked',data:data4})
+                        }else{
+                            res.status(302).send({success:'false',message:'does not blocked your account'})
+                        }
+                   }else{
+                       res.status(302).send({success:'false',message:'data not found'})
+                   }
                 }
             }else{
                 res.status(302).send({success:'false',message:'unauthorized'})
@@ -174,9 +190,9 @@ function locationCalc(lat1, lon1,latitude,longitude)
       var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
         Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(latitude);
       var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-      var resultOfKM= R * c;
-      console.log('resultOfKM',Math.floor(resultOfKM))
-      return Math.floor(resultOfKM);
+      var resultOfMeters= R * c;
+      console.log('resultOfMeters',Math.floor(resultOfMeters))
+      return Math.floor(resultOfMeters);
 }
 // Converts numeric degrees to radians
 function toRad(Value) 
@@ -222,6 +238,25 @@ const userCancelForCab=async(req,res)=>{
         res.status(500).send({message:'internal server error'})
     }
 }
+const userGetOurcancelBookingHistory=async(req,res)=>{
+    try{
+        const userToken=jwt.decode(req.headers.authorization)
+        if(userToken!=null){
+            const data=await cancelBooking.aggregate([{$match:{$and:[{"userId":(userToken.userId)},{"userBooking.rideStatus":'cancelBooking'},{deleteFlag:"false"}]}}])
+            console.log('line 230',data)
+            if(data.length!=null){
+                data.sort().reverse()
+                res.status(200).send({success:'true',message:'your cancel details',data:data})
+            }else{
+                res.status(302).send({success:'false',message:'data not found'})
+            }
+        }else{
+            res.status(302).send({success:'false',message:'unauthorized'})
+        }
+    }catch(err){
+        res.status(500).send({message:'internal server error'})
+    }
+}
 const userGetOurOwnBookingHistory=async(req,res)=>{
      try{
          const userToken=jwt.decode(req.headers.authorization)
@@ -229,6 +264,7 @@ const userGetOurOwnBookingHistory=async(req,res)=>{
          if(id!=null){
              const data=await userBooking.aggregate([{$match:{$and:[{"userId":(id)},{deleteFlag:'false'}]}}])
              if(data.length!=0){
+                 data.sort().reverse()
                 res.status(200).send({success:'true',message:'your booking history',data:data})
              }else{
                 res.status(302).send({success:'false',message:'data not found',data:[]})
@@ -270,7 +306,7 @@ const userGetOurOwnBookingHistory=async(req,res)=>{
 const getAllUserBookingDetails=async(req,res)=>{
     try{
        if(req.headers.authorization){
-        const data=await userBooking.find({})
+        const data=await userBooking.find({deleteFlag:'false'})
             if(data){
                 data.sort().reverse()
                 console.log('line 96',data)
@@ -284,6 +320,24 @@ const getAllUserBookingDetails=async(req,res)=>{
        
     }catch(err){
         res.status(500).send({success:'false',message:'internal server error'})
+    }
+}
+const getAllCancelBooking=async(req,res)=>{
+    try{
+        const superAdminToken=jwt.decode(req.headers.authorization)
+        if(superAdminToken!=null){
+            const data=await cancelBooking.find({deleteFlag:'false'})
+            if(data!=null){
+                data.sort().reverse()
+                res.status(200).send({success:'true',message:'All cancel booking',data:data})
+            }else{
+                res.status(302).send({success:'false',message:'data not found'})
+            }
+        }else{
+            res.status(302).send({success:'false',message:'unauthorized'})
+        }
+    }catch(err){
+        res.status(500).send({message:'internal server error'})
     }
 }
 const getAllPendingBookingDetails=async(req,res)=>{
@@ -303,7 +357,7 @@ const getAllPendingBookingDetails=async(req,res)=>{
 const getSingleUserBookingDetails=async(req,res)=>{
     try{
         if(req.headers.authorization){
-         const data=await userBooking.findOne({_id:req.params.userBookingId})
+         const data=await userBooking.findOne({_id:req.params.userBookingId,deleteFlag:'false'})
              if(data){
                  console.log('line 96',data)
                  res.status(200).send({message:'your booking data',data})
@@ -333,7 +387,6 @@ const userSearch=async(req,res)=>{
         res.status(500).send({success:'false',message:'internal server error'})
     }
 }
-
 const createUserprofileAccountDetails=async(req,res)=>{
     try{
         const token=jwt.decode(req.headers.authorization)
@@ -503,10 +556,12 @@ module.exports={
     userBookingCab,
     userCancelForCab,
     getAllUserBookingDetails,
+    getAllCancelBooking,
     getSingleUserBookingDetails,
     userGetOurPreviousBookingHistory,
     userGetOurOwnBookingHistory,
     getAllPendingBookingDetails,
+    userGetOurcancelBookingHistory,
     
 
     TotalRide,

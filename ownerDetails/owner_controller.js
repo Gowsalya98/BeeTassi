@@ -1,4 +1,4 @@
-const {userBooking}=require('../userDetails/user_model')
+const {userBooking,cancelBooking}=require('../userDetails/user_model')
 const {register}=require('../register/register_model')
 const {driverDetails}=require('../driverDetails/driver_model')
 const{cabDetails}=require('../vehicleDetails/vehicle_model')
@@ -109,7 +109,6 @@ const ownerGetOurOwnVehicleCount=async(req,res)=>{
 }
 const ownergetOurOwnCabBookingHistory=async(req,res)=>{
     try{
-        try{
             const ownerToken=jwt.decode(req.headers.authorization)
             const id=ownerToken.userId
             console.log('line 115',id)
@@ -125,8 +124,44 @@ const ownergetOurOwnCabBookingHistory=async(req,res)=>{
             }else{
                res.status(400).send({success:'false',message:'invalid token'})
             }
-        }catch(err){
-            res.status(500).send({message:'internal server error'})
+    }catch(err){
+        res.status(500).send({message:'internal server error'})
+    }
+}
+const ownerGetOurCancelBookingHistory=async(req,res)=>{
+    try{
+        const ownerToken=jwt.decode(req.headers.authorization)
+        if(ownerToken!=null){
+            console.log('line 135',ownerToken);
+            const data=await cancelBooking.aggregate([{$match:{$and:[{"userBooking.cabDetails.cabOwnerId":ownerToken.userId},{bookingStatus:'cancelBooking',deleteFlag:'false'}]}}])
+            console.log('line 138',data)
+            if(data.length!=0){
+                data.sort().reverse()
+                res.status(200).send({success:'true',message:'cancel booking details',data:data})
+            }else{
+                res.status(302).send({success:'false',message:'data not found',data:[]})
+             }
+        }else{
+            res.status(500).send({succcess:'false',message:'unauthorized'})
+        }
+    }catch(err){
+        res.status(500).send({message:'internal server error'})
+    }
+}
+const ownerGetCancelBookingCount=async(req,res)=>{
+    try{
+        const ownerToken=jwt.decode(req.headers.authorization)
+        if(ownerToken!=null){
+            const data=await cancelBooking.aggregate([{$match:{$and:[{"userBooking.cabDetails.cabOwnerId":ownerToken.userId},{bookingStatus:'cancelBooking',deleteFlag:'false'}]}}])
+            console.log('line 138',data)
+            if(data.length!=0){
+                const count=data.length
+                res.status(200).send({success:'true',message:'cancel booking count',count})
+            }else{
+                res.status(302).send({success:'false',message:'data not found',data:[]})
+             }
+        }else{
+            res.status(500).send({succcess:'false',message:'unauthorized'})
         }
     }catch(err){
         res.status(500).send({message:'internal server error'})
@@ -305,12 +340,14 @@ module.exports={
     search,ownerGetOurOwnEmployeeList,
     ownerGetOurOwnVehicleList,
     ownergetOurOwnCabBookingHistory,
+    ownerGetOurCancelBookingHistory,
 
     ownerGetOurOwnRideCount,
     completeRideCount,
     ownerGetOurOwnVehicleCount,
     pendingRideCount,
     upcomingRideCount,
+    ownerGetCancelBookingCount,
 
     createOwnerProfileDetails,
     getAllOwnerList,

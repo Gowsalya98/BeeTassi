@@ -5,7 +5,7 @@ const nodemailer=require('nodemailer')
 const moment=require('moment')
 const jwt=require('jsonwebtoken')
 const bcrypt=require('bcrypt')
-const { userBooking } = require('../userDetails/user_model')
+const { userBooking,cancelBooking } = require('../userDetails/user_model')
 
 const addDriver=(req,res)=>{
     try{
@@ -128,6 +128,26 @@ const ownerGetOwnDriverCount=async(req,res)=>{
         res.status(500).send({message:err.message}) 
     }
 }
+const driverViewCancelRide=async(req,res)=>{
+    try{
+        const driverToken=jwt.decode(req.headers.authorization)
+        if(driverToken!=null){
+            console.log('line 135',driverToken.userId)
+            const data=await cancelBooking.aggregate([{$match:{$and:[{"userBooking.cabDetails.driverId":(driverToken.userId)},{"userBooking.rideStatus":'cancelBooking'},{deleteFlag:'false'}]}}])
+            console.log('line 136',data);
+            if(data!=null){
+                data.sort().reverse()
+                res.status(200).send({success:'false',message:'cancel booking list',data:data})
+            }else{
+                res.status(400).send({success:'false',message:'data not found'})
+            }
+        }else{
+            res.status(302).send({success:'false',message:'unauthorized'})
+        }
+    }catch(err){
+        res.status(500).send({message:'internal server error'})
+    }
+}
 const TotalRideForDriver=async(req,res)=>{
     try{
         const driverToken=jwt.decode(req.headers.authorization)
@@ -236,7 +256,7 @@ const driverAcceptUserRide=async(req,res)=>{
     try{
         const driverToken=jwt.decode(req.headers.authorization)
         if(driverToken!=null){
-      const data=await userBooking.findOne({_id:req.params.bookingId,deleteFlag:false})
+      const data=await userBooking.findOne({_id:req.params.bookingId,deleteFlag:"false"})
       console.log('line 131',data)
       if(data){
           console.log('line 133',data.userDetails.email)
@@ -262,7 +282,7 @@ const driverAcceptUserRide=async(req,res)=>{
     try{
         const driverToken=jwt.decode(req.headers.authorization)
         if(driverToken!=null){
-      const data=await userBooking.findOne({_id:req.params.bookingId,deleteFlag:false})
+      const data=await userBooking.findOne({_id:req.params.bookingId,deleteFlag:"false"})
       console.log('line 152',data)
       if(data){
           console.log('line 154',data.userDetails.email)
@@ -367,6 +387,7 @@ module.exports={
     TotalRideForDriver,
     currentDayRideForDriver,
     ownerGetOwnDriverCount,
+    driverViewCancelRide,
     TotalDriver,
     TodayDriver
   

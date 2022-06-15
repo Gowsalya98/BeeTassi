@@ -12,6 +12,8 @@ router.get('/getSingleUserBookingDetails/:userBookingId',bookingControl.getSingl
 
 //cancel booking
 router.post('/cancel-booking/:bookingId',bookingControl.userCancelForCab)
+router.get('/getAll-cancelBooking',bookingControl.getAllCancelBooking)
+router.get('/ownCancelBooking',bookingControl.userGetOurcancelBookingHistory)
 
 //user details
 router.put('/userProfile',bookingControl.createUserprofileAccountDetails)

@@ -41,6 +41,10 @@ const registerSchema=mongoose.Schema({
     //     default:'pending'
     // },
     typeOfRole:String,
+    userStatus:{
+        type:String,
+        default:'active'
+    },
     createdAt:String,
     deleteFlag:{
         type:String,
