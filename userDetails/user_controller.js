@@ -54,7 +54,7 @@ const userBookingCab= async(req, res) => {
                                 console.log('line 52',locationOfUser)
                                 console.log('line 53',req.body.travelDistance)
 
-                                const data4=await cabDetails.findOne({_id:req.params.cabId,deleteFlag:'false'})
+                                const data4=await cabDetails.findOne({carRegNumber:req.params.carRegNumber,deleteFlag:'false'})
                                 console.log('line 56',data4)
                                 if(data4!=null){
                                     req.body.cabDetails=data4
@@ -64,7 +64,7 @@ const userBookingCab= async(req, res) => {
                                     const count=((data4.perKMPrice)*(req.body.travelDistance/1000))
                                     req.body.price=count+data4.serviceAmount
                                     console.log('line 62',req.body.price)
-                                    const data5=await cabDetails.findOneAndUpdate({_id:req.params.cabId},{$set:{"cabDetails.cabStatus":'booked'}},{new:true})
+                                    const data5=await cabDetails.findOneAndUpdate({carRegNumber:req.params.carRegNumber},{$set:{"cabDetails.cabStatus":'booked'}},{new:true})
                                     if(data5!=null){
                                         req.body.createdAt=moment(new Date()).toISOString().slice(0,10)
                                         console.log('line 66',req.body)
@@ -120,17 +120,17 @@ const userBookingCab= async(req, res) => {
                                  console.log('line 120',locationOfUser)
                                  console.log('line 121',req.body.travelDistance)
  
-                                 const data4=await cabDetails.findOne({_id:req.params.cabId,deleteFlag:'false'})
+                                 const data4=await cabDetails.findOne({carRegNumber:req.params.carRegNumber,deleteFlag:'false'})
                                  console.log('line 124',data4)
                                  if(data4!=null){
                                      req.body.cabDetails=data4
                                      req.body.cabId=data4._id
-                                     const count=data4.perKMPrice*req.body.travelDistance
+                                     const count=((data4.perKMPrice)*(req.body.travelDistance/1000))
                                      req.body.serviceAmount=data4.serviceAmount
                                      req.body.penalityAmount=data1[0].penalityAmount
                                      req.body.price=count+data4.serviceAmount+data1[0].penalityAmount
                                      console.log('line 130',req.body.price)
-                                     const data5=await cabDetails.findOneAndUpdate({_id:req.params.cabId},{$set:{"cabDetails.cabStatus":'booked'}},{new:true})
+                                     const data5=await cabDetails.findOneAndUpdate({carRegNumber:req.params.carRegNumber},{$set:{"cabDetails.cabStatus":'booked'}},{new:true})
                                      if(data5!=null){
                                          req.body.createdAt=moment(new Date()).toISOString().slice(0,10)
                                          console.log('line 134',req.body)
@@ -160,6 +160,7 @@ const userBookingCab= async(req, res) => {
                         const data3=await register.findOneAndUpdate({_id:userToken.userId},{$set:{userStatus:'inactive'}},{new:true})
                         console.log('line 161',data3)
                         if(data3!=null){
+                            req.body.blockedUser=data3
                             const data4=await blockUser.create(req.body)
                             console.log('line 164',data4)
                             res.status(200).send({success:'true',message:'your account is blocked',data:data4})

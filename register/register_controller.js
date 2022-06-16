@@ -120,7 +120,7 @@ const login=(req,res)=>{
                         })
                     //}else{res.send({message:'password does not match'})}
                 }else{res.send({message:'unauthorized'})}
-            }else{res.send({message:'data not found'})}
+            }else{res.status(302).send({success:'true',message:'your account is blocked'})}
                 })
                 
                 }else{

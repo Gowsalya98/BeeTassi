@@ -1,6 +1,6 @@
 const router=require('express').Router()
 const driverControl=require('../driverDetails/driver_controller')  
-const{location}=require('./location_controller')
+const{location,selectCabForUser}=require('./location_controller')
 const valid=require('../register/register_model')
 
 //driver profile
@@ -34,6 +34,7 @@ router.get('/rejectUserRide/:bookingId',driverControl.driverRejectUserRide)
 
 //filter location
 router.get('/filterLocation/:latitude/:longitude',location)
+router.post('/selectCab/:carRegNumber',selectCabForUser)
 
 
 module.exports=router
