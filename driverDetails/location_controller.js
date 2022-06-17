@@ -41,7 +41,7 @@ exports.selectCabForUser=async(req,res)=>{
   try{
     const userToken=jwt.decode(req.headers.authorization)
     if(userToken!=null){
-    const data=await driverDetails.aggregate([{$match:{$and:[{carRegNumber:req.params.carRegNumber},{deleteFlag:'false'}]}}])
+    const data=await driverDetails.aggregate([{$match:{$and:[{carRegNumber:req.body.carRegNumber},{deleteFlag:'false'}]}}])
     console.log('line 45',data);
     if(data!=null){
       console.log('line 46',data);

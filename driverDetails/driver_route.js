@@ -34,7 +34,7 @@ router.get('/rejectUserRide/:bookingId',driverControl.driverRejectUserRide)
 
 //filter location
 router.get('/filterLocation/:latitude/:longitude',location)
-router.post('/selectCab/:carRegNumber',selectCabForUser)
+router.post('/selectCab',selectCabForUser)
 
 
 module.exports=router

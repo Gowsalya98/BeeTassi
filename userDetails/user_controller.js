@@ -58,10 +58,15 @@ const userBookingCab= async(req, res) => {
                                 console.log('line 56',data4)
                                 if(data4!=null){
                                     req.body.cabDetails=data4
+                                    console.log('line 61',req.body.cabDetails);
                                     req.body.cabId=data4._id
+                                    console.log('line 63',req.body.cabId);
                                     req.body.perKMPrice=data4.perKMPrice
+                                    console.log('line 65',req.body.perKMPrice);
                                     req.body.serviceAmount=data4.serviceAmount
+                                    console.log('line 67', req.body.serviceAmount);
                                     const count=((data4.perKMPrice)*(req.body.travelDistance/1000))
+                                    console.log(('line 69',count));
                                     req.body.price=count+data4.serviceAmount
                                     console.log('line 62',req.body.price)
                                     const data5=await cabDetails.findOneAndUpdate({carRegNumber:req.params.carRegNumber},{$set:{"cabDetails.cabStatus":'booked'}},{new:true})

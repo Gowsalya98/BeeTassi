@@ -59,6 +59,8 @@ const createPaymentId=async(req,res)=>{
 
 const getAllPaymentList=(req,res)=>{
     try{
+        const token=jwt.decode(req.headers.authorization)
+        if(token!=null){
         payment.find({deleteFlag:'false'},(err,data)=>{
             if(data){
                 data.sort().reverse()
@@ -68,6 +70,9 @@ const getAllPaymentList=(req,res)=>{
                 res.status(400).send({message:'data not found',data:[]})
             }
         })
+    }else{
+        res.status(302).send({message:'unauthorized'})
+    }
     }catch(err){
         res.status(500).send({message:err.message})
     }
