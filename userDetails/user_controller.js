@@ -16,7 +16,7 @@ const userBookingCab= async(req, res) => {
         if(!errors.isEmpty()){
             return res.status(400).send({errors:errors.array()})
         }else{
-        console.log('line 19',req.body);
+        // console.log('line 19',req.body);
         if(req.body!=null){
             const userToken=jwt.decode(req.headers.authorization)
             if(userToken.userId!=null){
@@ -25,57 +25,59 @@ const userBookingCab= async(req, res) => {
                 console.log('line 23',data1.length)
                 if(data1.length==0){
                    const data2=await register.aggregate([{$match:{$and:[{"_id":new mongoose.Types.ObjectId(userToken.userId)},{deleteFlag:"false"}]}}])
+                //    console.log(data2)
                         if(data2!=null){
                             req.body.userId=userToken.userId
                             req.body.userDetails=data2[0]
                             const otp = randomString(3)
-                            console.log("otp", otp) 
+                            // console.log("otp", otp) 
                             const data3=await sendOtp.create({otp: otp,userDetails:req.body.userDetails})
-                            console.log('line 32',data3)
+                            // console.log('line 32',data3)
                             if (data3!=null) {
                                 let options = { provider: 'openstreetmap'}
                                 let geoCoder = nodeGeocoder(options);
+                                console.log(geoCoder)
                                 const convertAddressToLatLon=await(geoCoder.geocode(req.body.drop))
-                                console.log('line 37',convertAddressToLatLon)
+                                // console.log('line 37',convertAddressToLatLon)
                                                     
                                 req.body.dropLocation = {"dropLatitude":convertAddressToLatLon[0].latitude,"dropLongitude":convertAddressToLatLon[0].longitude}
-                                console.log('line 40',req.body.dropLocation)
+                                // console.log('line 40',req.body.dropLocation)
             
                                 const d=req.body.dropLocation
-                                console.log('line 43',d)
+                                // console.log('line 43',d)
             
                                 const lat1=req.body.pickUpLocation.pickUpLatitude
-                                console.log('pickUpLatitude:',lat1);
+                                // console.log('pickUpLatitude:',lat1);
                                 const lon1 =req.body.pickUpLocation.pickUpLongitude
-                                console.log('pickUpLongitude:',lon1);
+                                // console.log('pickUpLongitude:',lon1);
             
                                 const locationOfUser=locationCalc(lat1,lon1,d.dropLatitude,d.dropLongitude).toFixed(1);
                                 req.body.travelDistance=locationOfUser;
-                                console.log('line 52',locationOfUser)
-                                console.log('line 53',req.body.travelDistance)
+                                // console.log('line 52',locationOfUser)
+                                // console.log('line 53',req.body.travelDistance)
 
                                 const data4=await cabDetails.findOne({carRegNumber:req.params.carRegNumber,deleteFlag:'false'})
-                                console.log('line 56',data4)
+                                // console.log('line 5/6',data4)
                                 if(data4!=null){
                                     req.body.cabDetails=data4
-                                    console.log('line 61',req.body.cabDetails);
+                                    // console.log('line 61',req.body.cabDetails);
                                     req.body.cabId=data4._id
-                                    console.log('line 63',req.body.cabId);
+                                    // console.log('line 63',req.body.cabId);
                                     req.body.perKMPrice=data4.perKMPrice
-                                    console.log('line 65',req.body.perKMPrice);
+                                    // console.log('line 65',req.body.perKMPrice);
                                     req.body.serviceAmount=data4.serviceAmount
-                                    console.log('line 67', req.body.serviceAmount);
+                                    // console.log('line 67', req.body.serviceAmount);
                                     const count=((data4.perKMPrice)*(req.body.travelDistance/1000))
-                                    console.log(('line 69',count));
+                                    // console.log(('line 69',count));
                                     req.body.price=count+data4.serviceAmount
-                                    console.log('line 62',req.body.price)
+                                    // console.log('line 62',req.body.price)
                                     const data5=await cabDetails.findOneAndUpdate({carRegNumber:req.params.carRegNumber},{$set:{"cabDetails.cabStatus":'booked'}},{new:true})
                                     if(data5!=null){
                                         req.body.createdAt=moment(new Date()).toISOString().slice(0,10)
-                                        console.log('line 66',req.body)
+                                        // console.log('line 66',req.body)
                                         userBooking.create(req.body,async(err,result)=>{
                                             if(result!=null){
-                                                console.log('line 72',result)
+                                                // console.log('line 72',result)
                                                 const response = await fast2sms.sendMessage({ authorization: process.env.OTPKEY,message:otp,numbers:[req.body.contact]})
                                                 res.status(200).send({ message: "verification otp send your mobile number",otp,data:result})
                                             }else{
@@ -95,6 +97,7 @@ const userBookingCab= async(req, res) => {
                         }  
                     }                      
                 if(data1.length==1){
+                    console.log('inside 2nd if')
                     const data2=await register.aggregate([{$match:{$and:[{"_id":new mongoose.Types.ObjectId(userToken.userId)},{deleteFlag:"false"}]}}])
                          if(data2!=null){
                              req.body.userId=userToken.userId

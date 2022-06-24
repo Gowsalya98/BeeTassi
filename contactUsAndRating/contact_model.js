@@ -2,6 +2,7 @@ const mongoose=require('mongoose')
 const { randomString } = require('../userDetails/random_string')
 
 const contactUsSchema=mongoose.Schema({
+    createdAt:String,
     name:String,
     email:String,
     subject:String,
@@ -21,8 +22,23 @@ const ratingSchema=mongoose.Schema({
     }
 })
 
+const aboutUsSchema=mongoose.Schema({
+    createdAt:String,
+    aboutTitle:String,
+    subTitle:String,
+    happyCustomer:String,
+    luxuryCars:Number,
+    kilometersDriven:String,
+    deleteFlag:{
+        type:String,
+        default:'false'
+    }
+})
+
 const rating=mongoose.model('ratingSchema',ratingSchema)
+
 const contactUs=mongoose.model('contactUsSchema',contactUsSchema)
 
+const aboutUs=mongoose.model('aboutUsSchema',aboutUsSchema)
 
-module.exports={contactUs,rating}
+module.exports={contactUs,rating,aboutUs}
